@@ -33,8 +33,18 @@ import { borderRadiusSchemes, specialColorDark } from "../themes/colorScheme";
 import profileSample from "../../assets/profile-sample.jpg";
 import useNavigationState from "../../data/GlobalStates/NavigationState";
 import { RiCircleLine, RiDashboard2Line } from "react-icons/ri";
-import { blankPage, contractCreate, contractHistory, contractList, dashboardPage, orderCreate, orderHistory, orderList } from "../../data/NavigationUrlConstants";
+import {
+  blankPage,
+  contractCreate,
+  contractHistory,
+  contractList,
+  dashboardPage,
+  orderCreate,
+  orderHistory,
+  orderList,
+} from "../../data/NavigationUrlConstants";
 import { useNavigate } from "react-router-dom";
+import headerBg from "../../assets/graphic-header-design.png";
 
 export interface LinkItemProps {
   name: string;
@@ -143,9 +153,10 @@ const NavItem = ({ icon, path, children, subLinks, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          //   bg: specialColor_500,
+          // bg: specialColorHover,
           // bgGradient: "linear(to-r, #33FFBB, #00ffaa)",
           color: specialColorDark,
+          // boxShadow: "md",
         }}
         onClick={() => {
           if (subLinks.length == 0) {
@@ -160,11 +171,19 @@ const NavItem = ({ icon, path, children, subLinks, ...rest }: NavItemProps) => {
           }
         }}
         {...rest}
-        bgGradient={
-          NavigationActive?.pathUrl == path
-            ? "linear(to-r, #33FFBB, #00ffaa)"
-            : "linear(to-r, #FFFFFF, #FFFFFF)"
+        // bgGradient={
+        //   NavigationActive?.pathUrl == path
+        //     ? "linear(to-r, #33FFBB, #00ffaa)"
+        //     : "linear(to-r, #FFFFFF, #FFFFFF)"
+        // }
+        bgImage={
+          NavigationActive?.pathUrl == path || showSubLinks ? headerBg : ""
         }
+        boxShadow={
+          NavigationActive?.pathUrl == path || showSubLinks ? "md" : "none"
+        }
+        bgSize="cover" // Ensures the background image covers the entire Flex container
+        bgPosition="center" // Centers the background image
         color={"black"}
       >
         {icon && (

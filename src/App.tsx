@@ -7,31 +7,33 @@ import { colorsSchemes } from "./components/themes/colorScheme";
 import {
   blankPage,
   dashboardPage,
+  orderCreate,
   orderList,
 } from "./data/NavigationUrlConstants";
 import OrderPage from "./pages/Order/OrderPage";
 
 const BlankPage = React.lazy(() => import("./pages/BlankPage/BlankPage"));
+const OrderNew = React.lazy(() => import("./pages/Order/OrderNew"));
 const DashboardPage = React.lazy(
   () => import("./pages/Dashboard/DashboardPage")
 );
 
-// const colors = {
-//   PrimaryColorScheme: {
-//     50: "#6cabe0",
-//     100: "#4293d7",
-//     200: "#2d87d2",
-//     300: "#2979bd",
-//     400: "#246ca8",
-//     500: "#1b517e",
-//     600: "#123654",
-//     700: "#0e283f",
-//     800: "#091b2a",
-//     900: "#000000",
-//   },
-// };
+const colors = {
+  PrimaryColorScheme: {
+    50: "#e6fff7",
+    100: "#b3ffe5",
+    200: "#99ffdd",
+    300: "#80ffd4",
+    400: "#66ffcc",
+    500: "#33FFBB",
+    600: "#00ffaa",
+    700: "#00e699",
+    800: "#00cc88",
+    900: "#009966",
+  },
+};
 
-const theme = extendTheme({ colorsSchemes });
+const theme = extendTheme({ colors });
 
 const router = [
   {
@@ -45,6 +47,10 @@ const router = [
   {
     path: orderList,
     element: <OrderPage />,
+  },
+  {
+    path: orderCreate,
+    element: <OrderNew />,
   },
 ];
 

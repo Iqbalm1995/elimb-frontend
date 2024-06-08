@@ -1,5 +1,6 @@
 export const specialColor: string = "#33FFBB";
 export const specialColorDark: string = "#04583C";
+export const specialColorHover: string = "#EEFFF9";
 
 export const specialColor_50: string = "#e6fff7";
 export const specialColor_100: string = "#b3ffe5";
