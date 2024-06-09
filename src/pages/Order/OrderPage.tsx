@@ -161,7 +161,7 @@ const CardListOrder = ({ dataOrder }: { dataOrder: cardDataOrder }) => {
               <VStack alignItems={"start"} pt={3} spacing={0}>
                 <HStack>
                   <Text as={"b"} fontSize={"sm"} color={"gray.500"}>
-                    Requested :
+                    Penyalur :
                   </Text>
                   <Text
                     fontWeight="bold"
@@ -174,7 +174,7 @@ const CardListOrder = ({ dataOrder }: { dataOrder: cardDataOrder }) => {
                 </HStack>
                 <HStack>
                   <Text as={"b"} fontSize={"sm"} color={"gray.500"}>
-                    Destination :
+                    Pemanfaat :
                   </Text>
                   <Text
                     fontWeight="bold"
@@ -187,7 +187,7 @@ const CardListOrder = ({ dataOrder }: { dataOrder: cardDataOrder }) => {
                 </HStack>
                 <HStack>
                   <Text as={"b"} fontSize={"sm"} color={"gray.500"}>
-                    Transporter :
+                    Logistik :
                   </Text>
                   <Text
                     fontWeight="bold"
