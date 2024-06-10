@@ -57,11 +57,153 @@ import {
   RiMore2Line,
   RiVipCrownLine,
 } from "react-icons/ri";
+import {
+  ContractCompanies,
+  ContractOrder,
+  OrdersState,
+  useOrdersState,
+} from "../../data/GlobalStates/OrdersState";
+
+const OrderContractsInit: ContractOrder = {
+  contract_number: "0000000000000", // generate
+  contract_expired: "09/06/2025", // generate
+  companies_contracts: [
+    {
+      company_id: "00000000", // generate
+      company_name: "P T", // generate
+      company_role: "Penyalur", // constant
+    },
+    {
+      company_id: "00000000", // generate
+      company_name: "P T",
+      company_role: "Pemanfaat", // constant
+    },
+    {
+      company_id: "00000000", // generate
+      company_name: "P T", // generate
+      company_role: "Logistik", // constant
+    },
+  ],
+};
+
+const ListContractCompanies: ContractOrder[] = [
+  {
+    contract_number: "ABC1234567890",
+    contract_expired: "09/06/2025",
+    companies_contracts: [
+      {
+        company_id: "XYZ12345",
+        company_name: "P T A1B",
+        company_role: "Penyalur",
+      },
+      {
+        company_id: "LMN67890",
+        company_name: "P T C2D",
+        company_role: "Pemanfaat",
+      },
+      {
+        company_id: "QRS54321",
+        company_name: "P T E3F",
+        company_role: "Logistik",
+      },
+    ],
+  },
+  {
+    contract_number: "DEF2345678901",
+    contract_expired: "09/06/2025",
+    companies_contracts: [
+      {
+        company_id: "UVW23456",
+        company_name: "P T G4H",
+        company_role: "Penyalur",
+      },
+      {
+        company_id: "OPQ34567",
+        company_name: "P T I5J",
+        company_role: "Pemanfaat",
+      },
+      {
+        company_id: "TUV67890",
+        company_name: "P T K6L",
+        company_role: "Logistik",
+      },
+    ],
+  },
+  {
+    contract_number: "GHI3456789012",
+    contract_expired: "09/06/2025",
+    companies_contracts: [
+      {
+        company_id: "ABC34567",
+        company_name: "P T M7N",
+        company_role: "Penyalur",
+      },
+      {
+        company_id: "DEF45678",
+        company_name: "P T O8P",
+        company_role: "Pemanfaat",
+      },
+      {
+        company_id: "GHI56789",
+        company_name: "P T Q9R",
+        company_role: "Logistik",
+      },
+    ],
+  },
+  {
+    contract_number: "JKL4567890123",
+    contract_expired: "09/06/2025",
+    companies_contracts: [
+      {
+        company_id: "XYZ45678",
+        company_name: "P T S1T",
+        company_role: "Penyalur",
+      },
+      {
+        company_id: "LMN56789",
+        company_name: "P T U2V",
+        company_role: "Pemanfaat",
+      },
+      {
+        company_id: "QRS67890",
+        company_name: "P T W3X",
+        company_role: "Logistik",
+      },
+    ],
+  },
+  {
+    contract_number: "MNO5678901234",
+    contract_expired: "09/06/2025",
+    companies_contracts: [
+      {
+        company_id: "UVW56789",
+        company_name: "P T Y4Z",
+        company_role: "Penyalur",
+      },
+      {
+        company_id: "OPQ67890",
+        company_name: "P T A5B",
+        company_role: "Pemanfaat",
+      },
+      {
+        company_id: "TUV78901",
+        company_name: "P T C6D",
+        company_role: "Logistik",
+      },
+    ],
+  },
+];
 
 const OrderNew = () => {
   const setHeaderActive = useHeaderState(
     (state: HeaderState) => state.setHeaderActive
   );
+  const setOrderSelectedContract = useOrdersState(
+    (state: OrdersState) => state.setOrderSelectedContract
+  );
+  const { OrderSelectedContract } = useOrdersState((state) => ({
+    OrderSelectedContract: state.OrderSelectedContract,
+  }));
 
   useEffect(() => {
     // set header title page
@@ -69,6 +211,9 @@ const OrderNew = () => {
       tittle: "Create New Order",
       breadcrumbItems: ["Pages", "Order", "Create"],
     });
+
+    //set init value order state
+    setOrderSelectedContract(OrderContractsInit);
   }, []);
 
   return (
@@ -201,148 +346,6 @@ const FormWizard: React.FC = () => {
     </Box>
   );
 };
-
-interface ContractCompanies {
-  company_id: string;
-  company_name: string | null;
-  company_role: string;
-}
-
-interface ContractOrder {
-  contract_number: string;
-  contract_expired: string;
-  companies_contracts: ContractCompanies[];
-}
-
-const OrderContractsInit: ContractOrder = {
-  contract_number: "0000000000000", // generate
-  contract_expired: "09/06/2025", // generate
-  companies_contracts: [
-    {
-      company_id: "00000000", // generate
-      company_name: "P T", // generate
-      company_role: "Penyalur", // constant
-    },
-    {
-      company_id: "00000000", // generate
-      company_name: "P T",
-      company_role: "Pemanfaat", // constant
-    },
-    {
-      company_id: "00000000", // generate
-      company_name: "P T", // generate
-      company_role: "Logistik", // constant
-    },
-  ],
-};
-
-const ListContractCompanies: ContractOrder[] = [
-  {
-    contract_number: "ABC1234567890",
-    contract_expired: "09/06/2025",
-    companies_contracts: [
-      {
-        company_id: "XYZ12345",
-        company_name: "P T A1B",
-        company_role: "Penyalur",
-      },
-      {
-        company_id: "LMN67890",
-        company_name: "P T C2D",
-        company_role: "Pemanfaat",
-      },
-      {
-        company_id: "QRS54321",
-        company_name: "P T E3F",
-        company_role: "Logistik",
-      },
-    ],
-  },
-  {
-    contract_number: "DEF2345678901",
-    contract_expired: "09/06/2025",
-    companies_contracts: [
-      {
-        company_id: "UVW23456",
-        company_name: "P T G4H",
-        company_role: "Penyalur",
-      },
-      {
-        company_id: "OPQ34567",
-        company_name: "P T I5J",
-        company_role: "Pemanfaat",
-      },
-      {
-        company_id: "TUV67890",
-        company_name: "P T K6L",
-        company_role: "Logistik",
-      },
-    ],
-  },
-  {
-    contract_number: "GHI3456789012",
-    contract_expired: "09/06/2025",
-    companies_contracts: [
-      {
-        company_id: "ABC34567",
-        company_name: "P T M7N",
-        company_role: "Penyalur",
-      },
-      {
-        company_id: "DEF45678",
-        company_name: "P T O8P",
-        company_role: "Pemanfaat",
-      },
-      {
-        company_id: "GHI56789",
-        company_name: "P T Q9R",
-        company_role: "Logistik",
-      },
-    ],
-  },
-  {
-    contract_number: "JKL4567890123",
-    contract_expired: "09/06/2025",
-    companies_contracts: [
-      {
-        company_id: "XYZ45678",
-        company_name: "P T S1T",
-        company_role: "Penyalur",
-      },
-      {
-        company_id: "LMN56789",
-        company_name: "P T U2V",
-        company_role: "Pemanfaat",
-      },
-      {
-        company_id: "QRS67890",
-        company_name: "P T W3X",
-        company_role: "Logistik",
-      },
-    ],
-  },
-  {
-    contract_number: "MNO5678901234",
-    contract_expired: "09/06/2025",
-    companies_contracts: [
-      {
-        company_id: "UVW56789",
-        company_name: "P T Y4Z",
-        company_role: "Penyalur",
-      },
-      {
-        company_id: "OPQ67890",
-        company_name: "P T A5B",
-        company_role: "Pemanfaat",
-      },
-      {
-        company_id: "TUV78901",
-        company_name: "P T C6D",
-        company_role: "Logistik",
-      },
-    ],
-  },
-];
 
 const ContractSelected = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -479,6 +482,24 @@ const ItemContractCompany = ({
 }: {
   dataContract: ContractOrder;
 }) => {
+  const [CmpPenyalur, setCmpPenyalur] = useState<ContractCompanies>(
+    dataContract.companies_contracts.filter(
+      (x) => x.company_role === "Penyalur"
+    )[0]
+  );
+
+  const [CmpPemanfaat, setCmpPemanfaat] = useState<ContractCompanies>(
+    dataContract.companies_contracts.filter(
+      (x) => x.company_role === "Pemanfaat"
+    )[0]
+  );
+
+  const [CmpLogistik, setCmpLogistik] = useState<ContractCompanies>(
+    dataContract.companies_contracts.filter(
+      (x) => x.company_role === "Logistik"
+    )[0]
+  );
+
   return (
     <Flex justifyContent={"center"}>
       <Box as={VStack}>
@@ -521,7 +542,7 @@ const ItemContractCompany = ({
                       fontSize={"xs"}
                       color={"gray.600"}
                     >
-                      PT. Serba Guna Mitra
+                      {CmpPenyalur.company_name}
                     </Text>
                   </HStack>
                   <HStack>
@@ -534,7 +555,7 @@ const ItemContractCompany = ({
                       fontSize={"xs"}
                       color={"gray.600"}
                     >
-                      CV. Arklik Nusantara
+                      {CmpPemanfaat.company_name}
                     </Text>
                   </HStack>
                   <HStack>
@@ -547,7 +568,7 @@ const ItemContractCompany = ({
                       fontSize={"xs"}
                       color={"gray.600"}
                     >
-                      PT. Mamang Resing
+                      {CmpLogistik.company_name}
                     </Text>
                   </HStack>
                   <HStack>
@@ -589,6 +610,7 @@ const ItemContractCompany = ({
                 <Button
                   w={{ base: "80%", md: "auto" }}
                   rightIcon={<ArrowForwardIcon />}
+                  onClick={() => console.log(dataContract)}
                 >
                   Pilih
                 </Button>
