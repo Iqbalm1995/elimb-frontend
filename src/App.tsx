@@ -5,13 +5,20 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SidebarWithHeader from "./components/appsAdmin/AdminPanelLayout";
 import { colorsSchemes } from "./components/themes/colorScheme";
 import {
+  AuthPage,
   blankPage,
+  companiesPage,
   dashboardPage,
   orderCreate,
   orderList,
 } from "./data/NavigationUrlConstants";
 import OrderPage from "./pages/Order/OrderPage";
+import AuthenticationValidation from "./pages/Auth/AuthenticationValidation";
 
+const AuthrenticationPage = React.lazy(
+  () => import("./pages/Auth/AuthenticationPage")
+);
+const CompaniesPage = React.lazy(() => import("./pages/Company/CompaniesPage"));
 const BlankPage = React.lazy(() => import("./pages/BlankPage/BlankPage"));
 const OrderNew = React.lazy(() => import("./pages/Order/OrderNew"));
 const DashboardPage = React.lazy(
@@ -52,6 +59,14 @@ const router = [
     path: orderCreate,
     element: <OrderNew />,
   },
+  {
+    path: AuthPage,
+    element: <AuthrenticationPage />,
+  },
+  {
+    path: companiesPage,
+    element: <CompaniesPage />,
+  },
 ];
 
 const componentRoute = (
@@ -67,11 +82,13 @@ function App() {
     <ChakraProvider theme={extendTheme(theme)}>
       <BrowserRouter>
         <>
-          <SidebarWithHeader>
-            <Suspense fallback={<div>Mohon tunggu...</div>}>
-              {componentRoute}
-            </Suspense>
-          </SidebarWithHeader>
+          <AuthenticationValidation>
+            <SidebarWithHeader>
+              <Suspense fallback={<div>Mohon tunggu...</div>}>
+                {componentRoute}
+              </Suspense>
+            </SidebarWithHeader>
+          </AuthenticationValidation>
         </>
       </BrowserRouter>
     </ChakraProvider>

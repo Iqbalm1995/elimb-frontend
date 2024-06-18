@@ -1,5 +1,7 @@
 export const homePage: string = "/";
+export const AuthPage: string = "/login";
 export const dashboardPage: string = "/";
+export const companiesPage: string = "/companies";
 export const blankPage: string = "/blank-page";
 
 // order

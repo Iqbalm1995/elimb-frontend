@@ -8,7 +8,7 @@ import {
 } from "../../data/GlobalStates/HeaderaState";
 
 const BlankPage = () => {
-  const { NavigationActive } = useNavigationState((state) => ({
+  const { NavigationActive } = useNavigationState((state: any) => ({
     NavigationActive: state.NavigationActive,
   }));
   const setHeaderActive = useHeaderState(

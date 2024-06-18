@@ -35,6 +35,7 @@ import useNavigationState from "../../data/GlobalStates/NavigationState";
 import { RiCircleLine, RiDashboard2Line } from "react-icons/ri";
 import {
   blankPage,
+  companiesPage,
   contractCreate,
   contractHistory,
   contractList,
@@ -45,6 +46,7 @@ import {
 } from "../../data/NavigationUrlConstants";
 import { useNavigate } from "react-router-dom";
 import headerBg from "../../assets/graphic-header-design.png";
+import { PiWarehouseBold } from "react-icons/pi";
 
 export interface LinkItemProps {
   name: string;
@@ -61,49 +63,61 @@ export const LinkNavigations: Array<LinkItemProps> = [
     subLinks: [],
   },
   {
-    name: "Contracts",
+    name: "Kontrak",
     icon: FiTrendingUp,
     subLinks: [
       {
-        name: "Create New",
+        name: "Tambah Kontrak Baru",
         icon: FiPlus,
         pathUrl: contractCreate,
         subLinks: [],
       },
       {
-        name: "List",
+        name: "Daftar Kontrak",
         icon: FiCircle,
         pathUrl: contractList,
-        subLinks: [],
-      },
-      {
-        name: "History",
-        icon: FiCircle,
-        pathUrl: contractHistory,
         subLinks: [],
       },
     ],
   },
   {
-    name: "Orders",
+    name: "Order",
     icon: FiCompass,
     subLinks: [
       {
-        name: "Create New",
+        name: "Tambah Order Baru",
         icon: FiPlus,
         pathUrl: orderCreate,
         subLinks: [],
       },
       {
-        name: "List",
+        name: "Daftar Order",
         icon: FiCircle,
         pathUrl: orderList,
         subLinks: [],
       },
       {
-        name: "History",
+        name: "Daftar History",
         icon: FiCircle,
         pathUrl: orderHistory,
+        subLinks: [],
+      },
+    ],
+  },
+  {
+    name: "Instansi",
+    icon: PiWarehouseBold,
+    subLinks: [
+      {
+        name: "Tambah Baru",
+        icon: FiPlus,
+        pathUrl: "/",
+        subLinks: [],
+      },
+      {
+        name: "Daftar Instansi",
+        icon: FiCircle,
+        pathUrl: companiesPage,
         subLinks: [],
       },
     ],

@@ -32,6 +32,7 @@ import {
   HeaderState,
   useHeaderState,
 } from "../../data/GlobalStates/HeaderaState";
+import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
 
 export default function SidebarWithHeader({
   children,
@@ -89,6 +90,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   const { HeaderActive } = useHeaderState((state: HeaderState) => ({
     HeaderActive: state.HeaderActive,
   }));
+  const setLogin = useAuthenticationState((state: any) => state.setLogin);
+  const setAuthData = useAuthenticationState((state: any) => state.setAuthData);
 
   return (
     <>
@@ -178,9 +181,15 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               >
                 <MenuItem>Profile</MenuItem>
                 <MenuItem>Settings</MenuItem>
-                <MenuItem>Billing</MenuItem>
                 <MenuDivider />
-                <MenuItem>Sign out</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setLogin(false);
+                    setAuthData(null);
+                  }}
+                >
+                  Logout
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>

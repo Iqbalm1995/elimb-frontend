@@ -13,7 +13,7 @@ export const specialColor_700: string = "#00e699";
 export const specialColor_800: string = "#00cc88";
 export const specialColor_900: string = "#009966";
 
-export const borderRadiusSchemes: string = "15px";
+export const borderRadiusSchemes: string = "5px";
 
 export const colorsSchemes = {
   PrimaryColorScheme: {
