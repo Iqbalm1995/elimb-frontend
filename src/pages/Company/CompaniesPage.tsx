@@ -12,13 +12,16 @@ import {
   Flex,
   Grid,
   GridItem,
+  HStack,
   Input,
   Table,
   Tbody,
   Td,
+  Text,
   Th,
   Thead,
   Tr,
+  VStack,
 } from "@chakra-ui/react";
 import { borderRadiusSchemes } from "../../components/themes/colorScheme";
 import { useToastHelper } from "../../helper/ToastMessagesHelper";
@@ -104,7 +107,19 @@ const CompaniesPage = () => {
         footer: (props) => props.column.id,
       },
       {
-        accessorFn: (row) => row.name,
+        accessorFn: (row) => (
+          <VStack alignItems={"start"}>
+            <Text>{row.name}</Text>
+            <Text
+              fontSize={"xs"}
+              fontWeight={"700"}
+              color={"gray.500"}
+              textTransform={"uppercase"}
+            >
+              {row.companyAsTypeName}
+            </Text>
+          </VStack>
+        ),
         id: "name",
         cell: (info) => info.getValue(),
         header: () => <span>Nama Instansi</span>,
@@ -112,7 +127,7 @@ const CompaniesPage = () => {
       },
       {
         accessorFn: (row) => (
-          <Flex justifyContent="center">
+          <Flex justifyContent="start">
             {row.isActive == "1" ? (
               <Badge colorScheme="green">AKTIF</Badge>
             ) : (
@@ -129,11 +144,11 @@ const CompaniesPage = () => {
         accessorKey: "id",
         cell: (info) => (
           <>
-            <Flex justifyContent="center">
+            <Flex justifyContent="end">
               <Button
                 // isDisabled={allowEditData}
                 leftIcon={<EditIcon />}
-                colorScheme="bjb_color_theme"
+                colorScheme="teal"
                 variant="solid"
                 size={"sm"}
                 onClick={() => {
@@ -145,7 +160,7 @@ const CompaniesPage = () => {
             </Flex>
           </>
         ),
-        header: () => <span>Opsi</span>,
+        header: () => <Flex justifyContent="end">Opsi</Flex>,
         size: 10,
         enableColumnFilter: false,
         enableSorting: false,
@@ -218,15 +233,13 @@ const CompaniesPage = () => {
     <>
       <Box>
         <Card borderRadius={borderRadiusSchemes}>
-          <CardBody px={0}>
+          <CardBody>
             {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
             <>
               <Grid
                 templateColumns="repeat(12, 1fr)"
                 minWidth="max-content"
-                gap="2"
-                px={"10"}
-                py={"20px"}
+                gap="5"
               >
                 <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 6 }}>
                   <Flex justifyContent="flex-start" gap="2">
@@ -249,58 +262,80 @@ const CompaniesPage = () => {
                 <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 6 }}>
                   <TableInputShowPage table={table} />
                 </GridItem>
-              </Grid>
-              <div style={{ overflowX: "auto" }}>
-                <Table size={"sm"}>
-                  <Thead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <Tr key={headerGroup.id}>
-                        <Th>#</Th>
-                        {headerGroup.headers.map((header) => {
-                          return (
-                            <Th key={header.id} colSpan={header.colSpan}>
-                              {header.isPlaceholder ? null : (
-                                <div>
-                                  {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                  )}
-                                </div>
-                              )}
+                <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 12 }}>
+                  <div style={{ overflowX: "auto" }}>
+                    <Table size={"sm"}>
+                      <Thead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                          <Tr key={headerGroup.id}>
+                            <Th fontSize={12} color={"gray.500"} py={2}>
+                              #
                             </Th>
-                          );
-                        })}
-                      </Tr>
-                    ))}
-                  </Thead>
-                  <Tbody>
-                    {table.getRowModel().rows.length > 0 ? (
-                      table.getRowModel().rows.map((row, index) => {
-                        return (
-                          <Tr key={row.id}>
-                            <Td key={index}>{index + 1}</Td>
-                            {row.getVisibleCells().map((cell) => {
+                            {headerGroup.headers.map((header) => {
                               return (
-                                <Td key={cell.id}>
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
+                                <Th
+                                  key={header.id}
+                                  colSpan={header.colSpan}
+                                  fontSize={12}
+                                  color={"gray.500"}
+                                  py={2}
+                                >
+                                  {header.isPlaceholder ? null : (
+                                    <div>
+                                      {flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext()
+                                      )}
+                                    </div>
                                   )}
-                                </Td>
+                                </Th>
                               );
                             })}
                           </Tr>
-                        );
-                      })
-                    ) : (
-                      <Tr>
-                        <Td colSpan={6}></Td>
-                      </Tr>
-                    )}
-                  </Tbody>
-                </Table>
-              </div>
-              <ControlTable table={table} />
+                        ))}
+                      </Thead>
+                      <Tbody>
+                        {table.getRowModel().rows.length > 0 ? (
+                          table.getRowModel().rows.map((row, index) => {
+                            return (
+                              <Tr key={row.id}>
+                                <Td
+                                  key={index}
+                                  fontWeight={600}
+                                  fontSize={15}
+                                  color={"gray.800"}
+                                >
+                                  {index + 1}
+                                </Td>
+                                {row.getVisibleCells().map((cell) => {
+                                  return (
+                                    <Td
+                                      key={cell.id}
+                                      fontWeight={600}
+                                      fontSize={15}
+                                      color={"gray.800"}
+                                    >
+                                      {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
+                                      )}
+                                    </Td>
+                                  );
+                                })}
+                              </Tr>
+                            );
+                          })
+                        ) : (
+                          <Tr>
+                            <Td colSpan={6}></Td>
+                          </Tr>
+                        )}
+                      </Tbody>
+                    </Table>
+                  </div>
+                  <ControlTable table={table} />
+                </GridItem>
+              </Grid>
             </>
           </CardBody>
         </Card>
