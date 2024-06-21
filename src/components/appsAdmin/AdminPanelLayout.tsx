@@ -20,11 +20,17 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  Divider,
 } from "@chakra-ui/react";
 import { FiBell } from "react-icons/fi";
 import { SidebarContent } from "./Sidebar";
-import { borderRadiusSchemes, specialColor } from "../themes/colorScheme";
-import headerBg from "../../assets/graphic-header-design.png";
+import {
+  borderRadiusSchemes,
+  specialColor,
+  specialColorDark,
+  specialColorHover,
+} from "../themes/colorScheme";
+import headerBg from "../../assets/bg1.png";
 import profileSample from "../../assets/profile-sample.jpg";
 import { HiMenuAlt1 } from "react-icons/hi";
 import { RiHomeLine } from "react-icons/ri";
@@ -42,7 +48,11 @@ export default function SidebarWithHeader({
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+    <Box
+      minH="100vh"
+      // bg={useColorModeValue("gray.100", "gray.900")}
+      bg="linear-gradient(to bottom, #0082d1 35vh, #f1f1f2 35vh 100vh)"
+    >
       <SidebarContent
         onClose={onClose}
         display={{ base: "none", md: "block" }}
@@ -61,7 +71,8 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       <Box ml={{ base: 0, md: "270px" }} mr={{ base: 0, md: 3 }}>
-        <Box pt={{ base: 2, md: 4 }} position="sticky" top={0} zIndex={1}>
+        {/* <Box pt={{ base: 2, md: 4 }} position="sticky" top={0} zIndex={1}> */}
+        <Box pt={{ base: 2, md: 4 }}>
           <MobileNav onOpen={onOpen} />
         </Box>
         <Box py="4" px={{ base: 2, md: 0 }}>
@@ -96,15 +107,14 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   return (
     <>
       <Flex
-        borderRadius={borderRadiusSchemes}
-        mx={{ base: 2, md: 0 }}
-        boxShadow={{ base: "xl", md: "md" }}
+        // borderRadius={borderRadiusSchemes}
+        // boxShadow={{ base: "xl", md: "md" }}
         px={4}
         height="20"
         alignItems="center"
-        bg={specialColor}
-        bgImage={headerBg}
-        bgSize="cover" // Ensures the background image covers the entire Flex container
+        // bg={specialColor}
+        // bgImage={headerBg}
+        // bgSize="cover" // Ensures the background image covers the entire Flex container
         bgPosition="center" // Centers the background image
         //   justifyContent={{ base: "space-between", md: "flex-end" }}
         justifyContent={"space-between"}
@@ -125,6 +135,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           fontSize="2xl"
           fontFamily="monospace"
           fontWeight="bold"
+          color={"white"}
         >
           Logo
         </Text>
@@ -135,7 +146,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           display={{ base: "none", md: "flex" }}
         >
           <Box>
-            <Breadcrumb>
+            <Breadcrumb color={"white"}>
               <BreadcrumbItem>
                 <BreadcrumbLink href="#">
                   <RiHomeLine />
@@ -152,7 +163,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                 })}
             </Breadcrumb>
           </Box>
-          <Text fontSize="xl" as={"b"}>
+          <Text fontSize="xl" as={"b"} color={"white"}>
             {HeaderActive && HeaderActive.tittle}
           </Text>
         </VStack>
@@ -162,7 +173,160 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
             size="lg"
             variant="ghost"
             aria-label="open menu"
+            color={"white"}
             icon={<FiBell />}
+            _hover={{
+              color: specialColorDark,
+              bgColor: specialColorHover,
+            }}
+          />
+          <Flex alignItems={"center"}>
+            <Menu>
+              <MenuButton
+                py={2}
+                transition="all 0.3s"
+                _focus={{ boxShadow: "none" }}
+              >
+                <HStack>
+                  <Avatar size={"md"} src={profileSample} />
+                </HStack>
+              </MenuButton>
+              <MenuList
+                bg={useColorModeValue("white", "gray.900")}
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+              >
+                <MenuItem>Profile</MenuItem>
+                <MenuItem>Settings</MenuItem>
+                <MenuDivider />
+                <MenuItem
+                  onClick={() => {
+                    setLogin(false);
+                    setAuthData(null);
+                  }}
+                >
+                  Logout
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Flex>
+        </HStack>
+      </Flex>
+      <VStack
+        display={{ base: "flex", md: "none" }}
+        // borderRadius={borderRadiusSchemes}
+        pos={"relative"}
+        mx={{ base: 3, md: 0 }}
+        px={4}
+        py={2}
+        justifyContent="center"
+        color={"white"}
+      >
+        <Divider />
+        <Box pt={2}>
+          <Breadcrumb>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="#">
+                <RiHomeLine />
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {HeaderActive &&
+              HeaderActive.breadcrumbItems.length > 0 &&
+              HeaderActive.breadcrumbItems.map((item: string) => {
+                return (
+                  <BreadcrumbItem key={item}>
+                    <BreadcrumbLink href="#">{item}</BreadcrumbLink>
+                  </BreadcrumbItem>
+                );
+              })}
+          </Breadcrumb>
+        </Box>
+      </VStack>
+    </>
+  );
+};
+
+const MobileNavAlternative = ({ onOpen, ...rest }: MobileProps) => {
+  const { HeaderActive } = useHeaderState((state: HeaderState) => ({
+    HeaderActive: state.HeaderActive,
+  }));
+  const setLogin = useAuthenticationState((state: any) => state.setLogin);
+  const setAuthData = useAuthenticationState((state: any) => state.setAuthData);
+
+  return (
+    <>
+      <Flex
+        borderRadius={borderRadiusSchemes}
+        mx={{ base: 2, md: 0 }}
+        boxShadow={{ base: "xl", md: "md" }}
+        px={4}
+        height="20"
+        alignItems="center"
+        bg={specialColor}
+        bgImage={headerBg}
+        bgSize="cover"
+        bgPosition="center"
+        justifyContent={"space-between"}
+        {...rest}
+        zIndex={1}
+      >
+        <IconButton
+          display={{ base: "flex", md: "none" }}
+          onClick={onOpen}
+          variant="outline"
+          aria-label="open menu"
+          size="lg"
+          icon={<HiMenuAlt1 />}
+        />
+
+        <Text
+          display={{ base: "flex", md: "none" }}
+          fontSize="2xl"
+          fontFamily="monospace"
+          fontWeight="bold"
+          color={"white"}
+        >
+          Logo
+        </Text>
+
+        <VStack
+          spacing={1}
+          alignItems="flex-start"
+          display={{ base: "none", md: "flex" }}
+        >
+          <Box>
+            <Breadcrumb color={"white"}>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="#">
+                  <RiHomeLine />
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              {HeaderActive &&
+                HeaderActive.breadcrumbItems.length > 0 &&
+                HeaderActive.breadcrumbItems.map((item: string) => {
+                  return (
+                    <BreadcrumbItem key={item}>
+                      <BreadcrumbLink href="#">{item}</BreadcrumbLink>
+                    </BreadcrumbItem>
+                  );
+                })}
+            </Breadcrumb>
+          </Box>
+          <Text fontSize="xl" as={"b"} color={"white"}>
+            {HeaderActive && HeaderActive.tittle}
+          </Text>
+        </VStack>
+
+        <HStack spacing={{ base: "0", md: "6" }}>
+          <IconButton
+            size="lg"
+            variant="ghost"
+            aria-label="open menu"
+            color={"white"}
+            icon={<FiBell />}
+            _hover={{
+              color: specialColorDark,
+              bgColor: specialColorHover,
+            }}
           />
           <Flex alignItems={"center"}>
             <Menu>
@@ -206,7 +370,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         h={"20"}
         boxShadow={"lx"}
         zIndex={-1}
-        // alignItems="center"
         justifyContent="center"
         border={"1px"}
         borderColor={"gray.200"}

@@ -37,35 +37,35 @@ const DashboardPage = () => {
   return (
     <>
       <Grid templateColumns="repeat(12, 1fr)" gap={4}>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <CardStaticDisplay
             nameDisplay={"Display Static"}
             contentDisplay={"250"}
             iconDisplay={RiContractFill}
           />
         </GridItem>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <CardStaticDisplay
             nameDisplay={"Display Static"}
             contentDisplay={"3.400"}
             iconDisplay={RiContractFill}
           />
         </GridItem>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <CardStaticDisplay
             nameDisplay={"Display Static"}
             contentDisplay={"3.400"}
             iconDisplay={RiEmotionHappyLine}
           />
         </GridItem>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <CardStaticDisplay
             nameDisplay={"Display Static"}
             contentDisplay={"3.400"}
             iconDisplay={RiEmotionHappyLine}
           />
         </GridItem>
-        <GridItem w={"full"} colSpan={6}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
           <Card borderRadius={borderRadiusSchemes}>
             <CardBody>
               <Flex
@@ -79,7 +79,7 @@ const DashboardPage = () => {
             </CardBody>
           </Card>
         </GridItem>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <Card borderRadius={borderRadiusSchemes}>
             <CardBody>
               <Flex
@@ -93,7 +93,7 @@ const DashboardPage = () => {
             </CardBody>
           </Card>
         </GridItem>
-        <GridItem w={"full"} colSpan={3}>
+        <GridItem w={"full"} colSpan={{ base: 12, md: 3 }}>
           <Card borderRadius={borderRadiusSchemes}>
             <CardBody>
               <Flex

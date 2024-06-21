@@ -28,7 +28,7 @@ import {
   FiCircle,
   FiPlus,
 } from "react-icons/fi";
-import profileBg from "../../assets/graphic-profile-design.png";
+import profileBg from "../../assets/bg2.png";
 import { borderRadiusSchemes, specialColorDark } from "../themes/colorScheme";
 import profileSample from "../../assets/profile-sample.jpg";
 import useNavigationState from "../../data/GlobalStates/NavigationState";
@@ -45,7 +45,7 @@ import {
   orderList,
 } from "../../data/NavigationUrlConstants";
 import { useNavigate } from "react-router-dom";
-import headerBg from "../../assets/graphic-header-design.png";
+import headerBg from "../../assets/bg1.png";
 import { PiWarehouseBold } from "react-icons/pi";
 
 export interface LinkItemProps {
@@ -198,7 +198,9 @@ const NavItem = ({ icon, path, children, subLinks, ...rest }: NavItemProps) => {
         }
         bgSize="cover" // Ensures the background image covers the entire Flex container
         bgPosition="center" // Centers the background image
-        color={"black"}
+        color={
+          NavigationActive?.pathUrl == path || showSubLinks ? "white" : "black"
+        }
       >
         {icon && (
           <Icon
@@ -266,21 +268,21 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       </Flex>
 
       <Box my={4}>
-        <Card bgImage={profileBg} objectFit={"cover"} mx={3}>
+        <Card bgImage={profileBg} objectFit={"cover"} mx={3} color={"white"}>
           <CardBody px={2}>
             <HStack>
               <Avatar size="md" src={profileSample} />
               <VStack alignItems="flex-start" spacing="1px" ml={2}>
                 <Tooltip label={username} hasArrow>
                   <Box maxWidth="90px" isTruncated>
-                    <Text fontSize="sm" isTruncated>
+                    <Text fontSize="sm" isTruncated fontWeight={500}>
                       {username}
                     </Text>
                   </Box>
                 </Tooltip>
                 <Tooltip label={role} hasArrow>
                   <Box maxWidth="90px" isTruncated>
-                    <Text fontSize="xs" color="gray.600" isTruncated>
+                    <Text fontSize="xs" color="gray.200" isTruncated>
                       {role}
                     </Text>
                   </Box>
