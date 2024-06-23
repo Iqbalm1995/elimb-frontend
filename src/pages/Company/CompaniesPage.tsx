@@ -14,6 +14,7 @@ import {
   GridItem,
   HStack,
   Input,
+  Stack,
   Table,
   Tbody,
   Td,
@@ -44,11 +45,17 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
 } from "@tanstack/react-table";
-import { EditIcon } from "@chakra-ui/icons";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import {
+  BasicTable,
   ControlTable,
   TableInputShowPage,
 } from "../../components/TableComponents";
+import { Link } from "react-router-dom";
+import {
+  companiesFormCreatePage,
+  companiesFormEditPage,
+} from "../../data/NavigationUrlConstants";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
@@ -145,18 +152,20 @@ const CompaniesPage = () => {
         cell: (info) => (
           <>
             <Flex justifyContent="end">
-              <Button
-                // isDisabled={allowEditData}
-                leftIcon={<EditIcon />}
-                colorScheme="teal"
-                variant="solid"
-                size={"sm"}
-                onClick={() => {
-                  console.log(info.row.original);
-                }}
-              >
-                Detail
-              </Button>
+              <Link to={`${companiesFormEditPage}?id=${info.row.original.id}`}>
+                <Button
+                  // isDisabled={allowEditData}
+                  leftIcon={<EditIcon />}
+                  colorScheme="primary"
+                  variant="solid"
+                  size={"sm"}
+                  // onClick={() => {
+                  //   console.log(info.row.original);
+                  // }}
+                >
+                  Detail
+                </Button>
+              </Link>
             </Flex>
           </>
         ),
@@ -232,22 +241,35 @@ const CompaniesPage = () => {
   return (
     <>
       <Box>
+        <Grid templateColumns="repeat(12, 1fr)" gap={6} pb={2}>
+          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}></GridItem>
+          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+            <Flex justifyContent={"flex-end"}>
+              <Link to={companiesFormCreatePage}>
+                <Button
+                  // colorScheme="primary"
+                  w={{ base: "full", md: "auto" }}
+                  leftIcon={<AddIcon />}
+                  size={{ base: "lg", md: "md" }}
+                >
+                  Buat Data Baru
+                </Button>
+              </Link>
+            </Flex>
+          </GridItem>
+        </Grid>
         <Card borderRadius={borderRadiusSchemes}>
           <CardBody>
             {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
             <>
-              <Grid
-                templateColumns="repeat(12, 1fr)"
-                minWidth="max-content"
-                gap="5"
-              >
-                <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 6 }}>
+              <Grid templateColumns="repeat(12, 1fr)" gap="2">
+                <GridItem colSpan={{ base: 12, md: 6 }}>
                   <Flex justifyContent="flex-start" gap="2">
                     <Input
                       borderRadius={borderRadiusSchemes}
                       size="md"
                       type="text"
-                      width="200px"
+                      width={{ base: "full", md: "200px" }}
                       value={globalFilter ?? ""}
                       onChange={(e) => {
                         const val = e.target.value
@@ -259,81 +281,11 @@ const CompaniesPage = () => {
                     />
                   </Flex>
                 </GridItem>
-                <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 6 }}>
+                <GridItem colSpan={{ base: 12, md: 6 }}>
                   <TableInputShowPage table={table} />
                 </GridItem>
-                <GridItem colSpan={{ base: 12, sm: 12, md: 12, lg: 12 }}>
-                  <div style={{ overflowX: "auto" }}>
-                    <Table size={"sm"}>
-                      <Thead>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                          <Tr key={headerGroup.id}>
-                            <Th fontSize={12} color={"gray.500"} py={2}>
-                              #
-                            </Th>
-                            {headerGroup.headers.map((header) => {
-                              return (
-                                <Th
-                                  key={header.id}
-                                  colSpan={header.colSpan}
-                                  fontSize={12}
-                                  color={"gray.500"}
-                                  py={2}
-                                >
-                                  {header.isPlaceholder ? null : (
-                                    <div>
-                                      {flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext()
-                                      )}
-                                    </div>
-                                  )}
-                                </Th>
-                              );
-                            })}
-                          </Tr>
-                        ))}
-                      </Thead>
-                      <Tbody>
-                        {table.getRowModel().rows.length > 0 ? (
-                          table.getRowModel().rows.map((row, index) => {
-                            return (
-                              <Tr key={row.id}>
-                                <Td
-                                  key={index}
-                                  fontWeight={600}
-                                  fontSize={15}
-                                  color={"gray.800"}
-                                >
-                                  {index + 1}
-                                </Td>
-                                {row.getVisibleCells().map((cell) => {
-                                  return (
-                                    <Td
-                                      key={cell.id}
-                                      fontWeight={600}
-                                      fontSize={15}
-                                      color={"gray.800"}
-                                    >
-                                      {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext()
-                                      )}
-                                    </Td>
-                                  );
-                                })}
-                              </Tr>
-                            );
-                          })
-                        ) : (
-                          <Tr>
-                            <Td colSpan={6}></Td>
-                          </Tr>
-                        )}
-                      </Tbody>
-                    </Table>
-                  </div>
-                  <ControlTable table={table} />
+                <GridItem colSpan={{ base: 12, md: 12 }}>
+                  <BasicTable table={table} />
                 </GridItem>
               </Grid>
             </>

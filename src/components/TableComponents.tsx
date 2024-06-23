@@ -1,4 +1,16 @@
-import { Button, Flex, Grid, GridItem, Select } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Grid,
+  GridItem,
+  Select,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import {
   BsChevronBarLeft,
   BsChevronBarRight,
@@ -6,6 +18,85 @@ import {
   BsChevronRight,
 } from "react-icons/bs";
 import { borderRadiusSchemes } from "./themes/colorScheme";
+import { flexRender } from "@tanstack/react-table";
+
+export function BasicTable({ table }: any) {
+  return (
+    <>
+      <div style={{ overflowX: "auto" }}>
+        <Table size={"sm"}>
+          <Thead>
+            {table.getHeaderGroups().map((headerGroup: any) => (
+              <Tr key={headerGroup.id}>
+                <Th fontSize={12} color={"gray.500"} py={2}>
+                  No.
+                </Th>
+                {headerGroup.headers.map((header: any) => {
+                  return (
+                    <Th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      fontSize={12}
+                      color={"gray.500"}
+                      py={2}
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </div>
+                      )}
+                    </Th>
+                  );
+                })}
+              </Tr>
+            ))}
+          </Thead>
+          <Tbody>
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row: any, index: any) => {
+                return (
+                  <Tr key={row.id}>
+                    <Td
+                      key={index}
+                      fontWeight={600}
+                      fontSize={15}
+                      color={"gray.800"}
+                    >
+                      {index + 1}
+                    </Td>
+                    {row.getVisibleCells().map((cell: any) => {
+                      return (
+                        <Td
+                          key={cell.id}
+                          fontWeight={600}
+                          fontSize={15}
+                          color={"gray.800"}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                );
+              })
+            ) : (
+              <Tr>
+                <Td colSpan={table.options.columns.length + 1}></Td>
+              </Tr>
+            )}
+          </Tbody>
+        </Table>
+      </div>
+      <ControlTable table={table} />
+    </>
+  );
+}
 
 export function ControlTable({ table }: any) {
   return (
@@ -81,7 +172,7 @@ export function TableInputShowPage({ table }: any) {
       <Select
         borderRadius={borderRadiusSchemes}
         size="md"
-        w="80px"
+        width={{ base: "full", md: "80px" }}
         value={table.getState().pagination.pageSize}
         onChange={(e) => {
           table.setPageSize(Number(e.target.value));

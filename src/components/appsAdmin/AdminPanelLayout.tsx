@@ -79,15 +79,16 @@ export default function SidebarWithHeader({
           {children}
         </Box>
 
-        <Box
+        <Flex
           borderTopWidth={1}
           borderStyle={"solid"}
           borderColor={useColorModeValue("gray.200", "gray.700")}
+          justifyContent={{ base: "center", md: "start" }}
         >
-          <Box py={5}>
+          <Box py={5} mx={5}>
             <Text>© 2022 Chakra Templates. All rights reserved</Text>
           </Box>
-        </Box>
+        </Flex>
       </Box>
     </Box>
   );

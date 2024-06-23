@@ -7,6 +7,8 @@ import { colorsSchemes } from "./components/themes/colorScheme";
 import {
   AuthPage,
   blankPage,
+  companiesFormCreatePage,
+  companiesFormEditPage,
   companiesPage,
   dashboardPage,
   orderCreate,
@@ -14,6 +16,7 @@ import {
 } from "./data/NavigationUrlConstants";
 import OrderPage from "./pages/Order/OrderPage";
 import AuthenticationValidation from "./pages/Auth/AuthenticationValidation";
+import CompaniesForm from "./pages/Company/CompaniesForm";
 
 const AuthrenticationPage = React.lazy(
   () => import("./pages/Auth/AuthenticationPage")
@@ -193,6 +196,14 @@ const router = [
   {
     path: companiesPage,
     element: <CompaniesPage />,
+  },
+  {
+    path: companiesFormCreatePage,
+    element: <CompaniesForm />,
+  },
+  {
+    path: companiesFormEditPage,
+    element: <CompaniesForm />,
   },
 ];
 

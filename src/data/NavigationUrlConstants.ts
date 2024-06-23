@@ -1,8 +1,12 @@
 export const homePage: string = "/";
 export const AuthPage: string = "/login";
 export const dashboardPage: string = "/";
-export const companiesPage: string = "/companies";
 export const blankPage: string = "/blank-page";
+
+// companies
+export const companiesPage: string = "/companies";
+export const companiesFormCreatePage: string = "/companies-create";
+export const companiesFormEditPage: string = "/companies-edit";
 
 // order
 export const orderCreate: string = "/order-create";

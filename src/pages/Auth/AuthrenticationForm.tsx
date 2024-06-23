@@ -8,12 +8,14 @@ import {
   InputRightElement,
   FormErrorMessage,
   VStack,
+  HStack,
+  Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { FiLogIn } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToastHelper } from "../../helper/ToastMessagesHelper";
 import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
 import { PostAuthenticationServices } from "../../services/AuthenticationServices";
@@ -137,6 +139,19 @@ export default function AuthrenticationForm() {
                 : ""}
             </FormErrorMessage>
           </FormControl>
+          <HStack justifyContent={"end"} w={"full"}>
+            <Link to={"#"}>
+              <Button
+                colorScheme="primary"
+                fontWeight={"300"}
+                fontSize={15}
+                fontStyle={"italic"}
+                variant="link"
+              >
+                Lupa Password ?
+              </Button>
+            </Link>
+          </HStack>
           <Stack spacing={6} mt="4" w={"full"}>
             <Stack
               direction={{ base: "column", sm: "row" }}

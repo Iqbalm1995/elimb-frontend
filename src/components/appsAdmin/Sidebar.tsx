@@ -268,7 +268,13 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       </Flex>
 
       <Box my={4}>
-        <Card bgImage={profileBg} objectFit={"cover"} mx={3} color={"white"}>
+        <Card
+          borderRadius={borderRadiusSchemes}
+          bgImage={profileBg}
+          objectFit={"cover"}
+          mx={3}
+          color={"white"}
+        >
           <CardBody px={2}>
             <HStack>
               <Avatar size="md" src={profileSample} />
