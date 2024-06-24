@@ -53,7 +53,11 @@ import listAreaRegencies from "../../data/ListOfArea/regencies.json";
 import listAreaDistricts from "../../data/ListOfArea/districts.json";
 import listAreaVillages from "../../data/ListOfArea/villages.json";
 import { ListAreaProvincestypes } from "../../typesModel/ListOfAreaTypes";
-import { DatePicker as ChakraDatePicker } from "@orange_digital/chakra-datepicker";
+import { SingleDatepicker } from "../../components/DayzedDatepicker";
+import {
+  convertStringToDate,
+  formatDateToYYYYMMDD,
+} from "../../helper/MasterHelper";
 
 const formInputInitial: CompanyDataForm = {
   id: null,
@@ -72,7 +76,7 @@ const formInputInitial: CompanyDataForm = {
   email: "",
   estabilishedDate: "",
   website: "",
-  isActive: "",
+  isActive: "1",
   companyLogo: "",
 };
 
@@ -333,6 +337,12 @@ const CompaniesForm: React.FC = () => {
     }
   };
 
+  const [EstabilishDate, setEstabilishDate] = useState(new Date());
+  const HandlingEstabilishDate = (date: Date) => {
+    // console.log(date);
+    formik.setFieldValue("estabilishedDate", formatDateToYYYYMMDD(date));
+  };
+
   return (
     <>
       <Box>
@@ -409,48 +419,75 @@ const CompaniesForm: React.FC = () => {
                   ) : (
                     <>
                       <VStack>
-                        <FormControl
-                          isInvalid={
-                            formik.errors.companyAsTypeId ? true : false
-                          }
-                          isRequired
+                        <Input
+                          id={"isActive"}
+                          type={"text"}
+                          // onChange={formik.handleChange}
+                          value={formik.values.isActive}
+                          disabled={true}
+                          display={"none"}
+                        />
+                        <Grid
+                          templateColumns="repeat(12, 1fr)"
+                          gap={2}
+                          w={"full"}
                         >
-                          <FormLabel>Industri Tipe</FormLabel>
-                          <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={OptionCompanyAsTypes[0]}
-                            onChange={(e) => {
-                              formik.setFieldValue("companyAsTypeId", e?.value);
-                            }}
-                            isSearchable={true}
-                            name="companyAsTypeId"
-                            options={OptionCompanyAsTypes}
-                          />
-                          <FormErrorMessage>
-                            {formik.errors.companyAsTypeId}
-                          </FormErrorMessage>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={formik.errors.companyTypeId ? true : false}
-                          isRequired
-                        >
-                          <FormLabel>Industri Badan Usaha</FormLabel>
-                          <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={OptionCompanyTypes[0]}
-                            onChange={(e) => {
-                              formik.setFieldValue("companyTypeId", e?.value);
-                            }}
-                            isSearchable={true}
-                            name="companyTypeId"
-                            options={OptionCompanyTypes}
-                          />
-                          <FormErrorMessage>
-                            {formik.errors.companyTypeId}
-                          </FormErrorMessage>
-                        </FormControl>
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={
+                                formik.errors.companyAsTypeId ? true : false
+                              }
+                              isRequired
+                            >
+                              <FormLabel>Industri Tipe</FormLabel>
+                              <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={OptionCompanyAsTypes[0]}
+                                onChange={(e) => {
+                                  formik.setFieldValue(
+                                    "companyAsTypeId",
+                                    e?.value
+                                  );
+                                }}
+                                isSearchable={true}
+                                name="companyAsTypeId"
+                                options={OptionCompanyAsTypes}
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.companyAsTypeId}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={
+                                formik.errors.companyTypeId ? true : false
+                              }
+                              isRequired
+                            >
+                              <FormLabel>Industri Badan Usaha</FormLabel>
+                              <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={OptionCompanyTypes[0]}
+                                onChange={(e) => {
+                                  formik.setFieldValue(
+                                    "companyTypeId",
+                                    e?.value
+                                  );
+                                }}
+                                isSearchable={true}
+                                name="companyTypeId"
+                                options={OptionCompanyTypes}
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.companyTypeId}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                        </Grid>
+
                         <FormControl
                           isInvalid={formik.errors.companyId ? true : false}
                           isRequired
@@ -533,68 +570,107 @@ const CompaniesForm: React.FC = () => {
                             {formik.errors.streetaddress2}
                           </FormErrorMessage>
                         </FormControl>
-                        <FormControl
-                          isInvalid={formik.errors.country ? true : false}
-                          isRequired
+                        <Grid
+                          templateColumns="repeat(12, 1fr)"
+                          gap={2}
+                          w={"full"}
                         >
-                          <FormLabel>Negara</FormLabel>
-                          <Input
-                            id={"country"}
-                            type={"text"}
-                            onChange={formik.handleChange}
-                            value={formik.values.country}
-                            isDisabled={true}
-                            placeholder="Negara"
-                          />
-                          <FormErrorMessage>
-                            {formik.errors.country}
-                          </FormErrorMessage>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={formik.errors.province ? true : false}
-                          isRequired
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={formik.errors.country ? true : false}
+                              isRequired
+                            >
+                              <FormLabel>Negara</FormLabel>
+                              <Input
+                                id={"country"}
+                                type={"text"}
+                                onChange={formik.handleChange}
+                                value={formik.values.country}
+                                isDisabled={true}
+                                placeholder="Negara"
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.country}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={formik.errors.province ? true : false}
+                              isRequired
+                            >
+                              <FormLabel>Provinsi</FormLabel>
+                              <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={OptionAreaProvices.filter((x) =>
+                                  x.label.includes(formik.values.province)
+                                )}
+                                onChange={(e) => {
+                                  formik.setFieldValue("province", e?.label);
+                                  SetOptionListAreaRegencies(e?.value);
+                                }}
+                                isSearchable={true}
+                                name="province"
+                                options={OptionAreaProvices}
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.province}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                        </Grid>
+                        <Grid
+                          templateColumns="repeat(12, 1fr)"
+                          gap={2}
+                          w={"full"}
                         >
-                          <FormLabel>Provinsi</FormLabel>
-                          <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={OptionAreaProvices.filter((x) =>
-                              x.label.includes(formik.values.province)
-                            )}
-                            onChange={(e) => {
-                              formik.setFieldValue("province", e?.label);
-                              SetOptionListAreaRegencies(e?.value);
-                            }}
-                            isSearchable={true}
-                            name="province"
-                            options={OptionAreaProvices}
-                          />
-                          <FormErrorMessage>
-                            {formik.errors.province}
-                          </FormErrorMessage>
-                        </FormControl>
-                        <FormControl
-                          isInvalid={formik.errors.city ? true : false}
-                          isRequired
-                        >
-                          <FormLabel>Kota/Kabupaten</FormLabel>
-                          <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            defaultValue={OptionAreaProvices.filter((x) =>
-                              x.label.includes(formik.values.city)
-                            )}
-                            onChange={(e) => {
-                              formik.setFieldValue("city", e?.label);
-                            }}
-                            isSearchable={true}
-                            name="city"
-                            options={OptionAreaRegencies}
-                          />
-                          <FormErrorMessage>
-                            {formik.errors.city}
-                          </FormErrorMessage>
-                        </FormControl>
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={formik.errors.city ? true : false}
+                              isRequired
+                            >
+                              <FormLabel>Kota/Kabupaten</FormLabel>
+                              <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                defaultValue={OptionAreaProvices.filter((x) =>
+                                  x.label.includes(formik.values.city)
+                                )}
+                                onChange={(e) => {
+                                  formik.setFieldValue("city", e?.label);
+                                }}
+                                isSearchable={true}
+                                name="city"
+                                options={OptionAreaRegencies}
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.city}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                          <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
+                            <FormControl
+                              isInvalid={
+                                formik.errors.postalCode ? true : false
+                              }
+                              isRequired
+                            >
+                              <FormLabel>Kode POS</FormLabel>
+                              <Input
+                                id={"postalCode"}
+                                type={"text"}
+                                onChange={formik.handleChange}
+                                value={formik.values.postalCode}
+                                placeholder="Isi Kode POS"
+                              />
+                              <FormErrorMessage>
+                                {formik.errors.postalCode}
+                              </FormErrorMessage>
+                            </FormControl>
+                          </GridItem>
+                        </Grid>
+
                         <FormControl
                           isInvalid={formik.errors.phoneNumber ? true : false}
                           isRequired
@@ -648,12 +724,14 @@ const CompaniesForm: React.FC = () => {
                           }
                           isRequired
                         >
-                          <FormLabel>Waktu Berdiri</FormLabel>
-                          <ChakraDatePicker
-                            initialValue={new Date()}
-                            onDateChange={(d) =>
-                              console.log("ChakraDatePicker::d", d)
-                            }
+                          <FormLabel>Tabggal Ditetapkan</FormLabel>
+                          <SingleDatepicker
+                            name="estabilishedDate"
+                            date={EstabilishDate}
+                            onDateChange={(e) => {
+                              setEstabilishDate(e);
+                              HandlingEstabilishDate(e);
+                            }}
                           />
                           <FormErrorMessage>
                             {formik.errors.estabilishedDate}
@@ -668,14 +746,14 @@ const CompaniesForm: React.FC = () => {
           </Grid>
         </form>
       </Box>
-      <Card borderRadius={borderRadiusSchemes}>
+      {/* <Card borderRadius={borderRadiusSchemes}>
         <CardBody>
           <div style={{ overflowX: "auto" }}>
             <pre>{JSON.stringify(formik, null, 2)}</pre>
           </div>
         </CardBody>
       </Card>
-      <Box h={"800px"}></Box>
+      <Box h={"800px"}></Box> */}
     </>
   );
 };
