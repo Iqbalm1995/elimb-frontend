@@ -16,7 +16,6 @@ import {
 } from "./data/NavigationUrlConstants";
 import OrderPage from "./pages/Order/OrderPage";
 import AuthenticationValidation from "./pages/Auth/AuthenticationValidation";
-import CompaniesForm from "./pages/Company/CompaniesForm";
 
 const AuthrenticationPage = React.lazy(
   () => import("./pages/Auth/AuthenticationPage")
@@ -26,6 +25,10 @@ const BlankPage = React.lazy(() => import("./pages/BlankPage/BlankPage"));
 const OrderNew = React.lazy(() => import("./pages/Order/OrderNew"));
 const DashboardPage = React.lazy(
   () => import("./pages/Dashboard/DashboardPage")
+);
+const CompaniesForm = React.lazy(() => import("./pages/Company/CompaniesForm"));
+const CompaniesFormEdit = React.lazy(
+  () => import("./pages/Company/CompaniesFormEdit")
 );
 
 const colors = {
@@ -115,16 +118,16 @@ const colors = {
     "900": "#4a4100",
   },
   green: {
-    "50": "#effff7",
-    "100": "#98ffcf",
-    "200": "#00f583",
-    "300": "#00da74",
-    "400": "#00bf66",
-    "500": "#00a458",
-    "600": "#008849",
-    "700": "#006a39",
-    "800": "#00572e",
-    "900": "#004826",
+    "50": "#e0ffe8",
+    "100": "#4eff7b",
+    "200": "#00e539",
+    "300": "#00c030",
+    "400": "#00ac2b",
+    "500": "#009124",
+    "600": "#007b1f",
+    "700": "#006319",
+    "800": "#005415",
+    "900": "#003d0f",
   },
   teal: {
     "50": "#e7feff",

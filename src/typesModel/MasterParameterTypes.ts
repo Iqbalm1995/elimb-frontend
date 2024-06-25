@@ -26,3 +26,9 @@ export interface ApiResponseOne<T> {
   message: string;
   data: T;
 }
+
+export interface SaveDataResponse {
+  status: boolean;
+  message: string;
+  errors: any;
+}

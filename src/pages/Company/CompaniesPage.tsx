@@ -51,7 +51,7 @@ import {
   ControlTable,
   TableInputShowPage,
 } from "../../components/TableComponents";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   companiesFormCreatePage,
   companiesFormEditPage,
@@ -72,6 +72,7 @@ const CompaniesPage = () => {
     (state: HeaderState) => state.setHeaderActive
   );
   const AuthData = useAuthenticationState((state: any) => state.AuthData);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // set header title page
@@ -201,7 +202,7 @@ const CompaniesPage = () => {
       setTotalPageData(
         response.data.countTotal > 0
           ? Math.ceil(response.data.countTotal / pageSize)
-          : -1
+          : 1
       );
     }).catch(function (error) {
       showToast({
@@ -219,7 +220,7 @@ const CompaniesPage = () => {
   const table = useReactTable({
     data,
     columns,
-    pageCount: totalPages ?? -1,
+    pageCount: totalPages ?? 1,
     state: {
       globalFilter,
       pagination,
@@ -238,6 +239,11 @@ const CompaniesPage = () => {
     manualPagination: true,
   });
 
+  // Navigation
+  const CreatePageAction = () => {
+    navigate(companiesFormCreatePage);
+  };
+
   return (
     <>
       <Box>
@@ -245,16 +251,16 @@ const CompaniesPage = () => {
           <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}></GridItem>
           <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
             <Flex justifyContent={"flex-end"}>
-              <Link to={companiesFormCreatePage}>
-                <Button
-                  // colorScheme="primary"
-                  w={{ base: "full", md: "auto" }}
-                  leftIcon={<AddIcon />}
-                  size={{ base: "lg", md: "md" }}
-                >
-                  Buat Data Baru
-                </Button>
-              </Link>
+              <Button
+                // colorScheme="primary"
+                w={{ base: "full", md: "auto" }}
+                leftIcon={<AddIcon />}
+                size={{ base: "lg", md: "md" }}
+                boxShadow={"lg"}
+                onClick={CreatePageAction}
+              >
+                Buat Data Baru
+              </Button>
             </Flex>
           </GridItem>
         </Grid>

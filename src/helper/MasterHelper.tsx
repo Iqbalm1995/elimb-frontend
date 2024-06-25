@@ -8,6 +8,9 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect } from "react";
 
+export const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 // capitalize each word string
 export function capitalizeWords(str: string) {
   let result = "";

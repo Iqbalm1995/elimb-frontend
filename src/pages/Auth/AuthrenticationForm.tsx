@@ -23,6 +23,10 @@ import { HttpStatusCode } from "axios";
 import { AuthResponse } from "../../typesModel/AuthTypes";
 import { homePage } from "../../data/NavigationUrlConstants";
 import { borderRadiusSchemes } from "../../components/themes/colorScheme";
+import {
+  HeaderState,
+  useHeaderState,
+} from "../../data/GlobalStates/HeaderaState";
 
 export interface PayloadAuthentication {
   username: string;
@@ -43,6 +47,9 @@ export default function AuthrenticationForm() {
   const showToast = useToastHelper();
   const setLogin = useAuthenticationState((state: any) => state.setLogin);
   const setAuthData = useAuthenticationState((state: any) => state.setAuthData);
+  const setHeaderActive = useHeaderState(
+    (state: HeaderState) => state.setHeaderActive
+  );
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
@@ -54,6 +61,7 @@ export default function AuthrenticationForm() {
     validateOnChange: false,
     validateOnBlur: false,
     onSubmit: (values: any) => {
+      setProcess(true);
       AuthAction({
         username: values.username,
         password: values.password,
@@ -65,12 +73,14 @@ export default function AuthrenticationForm() {
     var RequestAuthentication = PostAuthenticationServices(payload);
     RequestAuthentication.then(function (response: any) {
       if (response.status != HttpStatusCode.Ok) {
+        setProcess(false);
         showToast({
           description: `${response.data.message}`,
           statusToast: "warning",
         });
         return;
       }
+      setProcess(false);
       showToast({
         description: `Login sukses, Selamat Datang`,
         statusToast: "success",
@@ -78,8 +88,14 @@ export default function AuthrenticationForm() {
       const responseData: AuthResponse = response.data.data as AuthResponse;
       setAuthData(responseData);
       setLogin(true);
+      // set header title page
+      setHeaderActive({
+        tittle: "Dashboard",
+        breadcrumbItems: ["Pages", "Dashboard"],
+      });
       navigate(homePage);
     }).catch(function (error) {
+      setProcess(false);
       showToast({
         description: `Error : ${error.message}`,
         statusToast: "error",

@@ -16,7 +16,6 @@ import {
   Image,
   Input,
   SimpleGrid,
-  Stack,
   Text,
   Textarea,
   VStack,
@@ -30,9 +29,9 @@ import {
   HeaderState,
   useHeaderState,
 } from "../../data/GlobalStates/HeaderaState";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { companiesPage } from "../../data/NavigationUrlConstants";
-import { ArrowBackIcon, CheckIcon, RepeatClockIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import { useToastHelper } from "../../helper/ToastMessagesHelper";
 import { PostCompaniesDetailByIdServices } from "../../services/CompaniesServices";
 import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
@@ -57,13 +56,8 @@ import { ListAreaProvincestypes } from "../../typesModel/ListOfAreaTypes";
 import { SingleDatepicker } from "../../components/DayzedDatepicker";
 import {
   convertStringToDate,
-  delay,
   formatDateToYYYYMMDD,
 } from "../../helper/MasterHelper";
-import {
-  RequestInsertDataCompany,
-  RequestUpdateDataCompany,
-} from "../../data/CompaniesData/CompaniesHook";
 
 const formInputInitial: CompanyDataForm = {
   id: null,
@@ -106,11 +100,10 @@ const FormSchema = Yup.object().shape({
   //   companyLogo: Yup.string().required("Wajib di isi!"),
 });
 
-const CompaniesForm: React.FC = () => {
+const CompaniesFormEdit: React.FC = () => {
   const [SearchParams] = useSearchParams();
   const showToast = useToastHelper();
   const AuthData = useAuthenticationState((state: any) => state.AuthData);
-  const navigate = useNavigate();
   const { NavigationActive } = useNavigationState((state: any) => ({
     NavigationActive: state.NavigationActive,
   }));
@@ -139,83 +132,25 @@ const CompaniesForm: React.FC = () => {
   const [captionDialog, setCaptionDialog] = useState<string>("");
   const [questionMsgDialog, setQuestionMsgDialog] = useState<string>("");
 
-  // select data
-  // flag resouce load
-  const [OptionCompanyAsTypes, setOptionCompanyAsTypes] = useState<
-    OptionData[]
-  >([]);
-  const [OptionCompanyTypes, setOptionCompanyTypes] = useState<OptionData[]>(
-    []
-  );
-
-  const fetchOptionData = async () => {
-    const token = AuthData.apiKey;
-
-    const OptionDataCompanyAs = await RequestOptionDataGroupByGroupCode(
-      KeyOptionDataCompanyAsType,
-      token
-    );
-    setOptionCompanyAsTypes(OptionDataCompanyAs);
-
-    const OptionDataCompanyType = await RequestOptionDataGroupByGroupCode(
-      KeyOptionDataCompanyType,
-      token
-    );
-    setOptionCompanyTypes(OptionDataCompanyType);
-  };
-
-  const [OptionAreaProvices, setOptionAreaProvices] = useState<OptionData[]>(
-    listAreaProvinces.map((x) => ({
-      label: x.name,
-      value: x.id,
-    }))
-  );
-  const [OptionAreaRegencies, setOptionAreaRegencies] = useState<OptionData[]>(
-    []
-  );
-  const [OptionAreaDistricts, setOptionAreaDistricts] = useState<OptionData[]>(
-    []
-  );
-  const [OptionAreaVillages, setOptionAreaVillages] = useState<OptionData[]>(
-    []
-  );
-
-  const SetOptionListAreaRegencies = (id: string | null) => {
-    console.log(id);
-    setOptionAreaRegencies([]);
-    if (id) {
-      setOptionAreaRegencies(
-        listAreaRegencies
-          .filter((x) => x.province_id.includes(id))
-          .map((x) => ({
-            label: x.name,
-            value: x.id,
-          }))
-      );
-    }
-  };
-  // end setup option list area
-
   // recognition id
   useEffect(() => {
-    fetchOptionData();
     const EditId = SearchParams.get("id");
     setIsLoadingData(true);
+    let isEditMode = false;
     let titlePage = "Tambah";
     if (EditId) {
+      isEditMode = true;
       titlePage = "Ubah";
       setEditMode(true);
       RequestDetailData(EditId);
-    } else {
-      setIsLoadingData(false);
     }
+    setIsLoadingData(false);
     // set header title page
     setHeaderActive({
       tittle: `${titlePage} Instansi`,
       breadcrumbItems: ["Pages", "Instansi", `${titlePage}`],
     });
   }, []);
-
   // end recognition id
 
   // formik config
@@ -229,7 +164,7 @@ const CompaniesForm: React.FC = () => {
     },
     onSubmit: (values) => {
       console.log("SUBMITED");
-      console.log(values);
+      // console.log(values);
 
       if (values.companyLogo == null || values.companyLogo == "") {
         showToast({
@@ -239,50 +174,14 @@ const CompaniesForm: React.FC = () => {
         return;
       }
 
-      HandleSubmit(values);
+      //   setDetailbanner(values);
+      //   handleVerifikasi();
     },
   });
   // end formik config
 
-  // save data
-  const HandleSubmit = async (data: CompanyDataForm) => {
-    const token = AuthData.apiKey;
-    if (data.id == null) {
-      // Add
-      console.log(data);
-      let SaveData = await RequestInsertDataCompany(data, token);
-      if (SaveData.status == true) {
-        showToast({
-          description: SaveData.message,
-          statusToast: "success",
-        });
-      } else {
-        showToast({
-          description: SaveData.message,
-          statusToast: "error",
-        });
-      }
-    } else {
-      // Edit
-      console.log(data);
-      let SaveData = await RequestUpdateDataCompany(data, token);
-      if (SaveData.status == true) {
-        showToast({
-          description: SaveData.message,
-          statusToast: "success",
-        });
-      } else {
-        showToast({
-          description: SaveData.message,
-          statusToast: "error",
-        });
-      }
-    }
-  };
-
   // load data
-  const RequestDetailData = async (id: string) => {
-    await delay(2000);
+  const RequestDetailData = (id: string) => {
     var RequestAuthentication = PostCompaniesDetailByIdServices(
       id,
       AuthData.apiKey
@@ -299,24 +198,13 @@ const CompaniesForm: React.FC = () => {
       const responseDataDetail: CompanyData = response.data.data as CompanyData;
       const responseDataForm: CompanyDataForm = response.data
         .data as CompanyDataForm;
-
-      const getProvinceDataId = OptionAreaProvices.filter(
-        (x) => x.label == responseDataDetail.province
-      );
-      if (getProvinceDataId[0]) {
-        SetOptionListAreaRegencies(getProvinceDataId[0].value);
-      }
-
       setData(responseDataDetail);
       setDetailData(responseDataForm);
       formik.setValues(responseDataForm);
       if (responseDataDetail.companyLogo != null) {
         const urlImage: string =
-          "data:image/png;base64," + responseDataDetail.companyLogoBase64;
-        formik.setFieldValue(
-          "companyLogo",
-          responseDataDetail.companyLogoBase64
-        );
+          "data:image/png;base64," + responseDataDetail.companyLogo;
+        formik.setFieldValue("image", responseDataDetail.companyLogoBase64);
         setPreview(urlImage);
       }
       setIsLoadingData(false);
@@ -362,10 +250,73 @@ const CompaniesForm: React.FC = () => {
     if (preview !== null) {
       //   formik.setFieldValue("image", preview);
       const imageWithoutPrefix = preview.split(",")[1]; // Split at comma and take the second part
-      formik.setFieldValue("companyLogo", imageWithoutPrefix);
+      //   formik.setFieldValue("image", imageWithoutPrefix);
     }
   }, [preview]);
   // end image configuration
+
+  // select data
+  const [OptionCompanyAsTypes, setOptionCompanyAsTypes] = useState<
+    OptionData[]
+  >([]);
+  const [OptionCompanyTypes, setOptionCompanyTypes] = useState<OptionData[]>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchOptionData = async () => {
+      const token = AuthData.apiKey;
+
+      const OptionDataCompanyAs = await RequestOptionDataGroupByGroupCode(
+        KeyOptionDataCompanyAsType,
+        token
+      );
+      setOptionCompanyAsTypes(OptionDataCompanyAs);
+
+      const OptionDataCompanyType = await RequestOptionDataGroupByGroupCode(
+        KeyOptionDataCompanyType,
+        token
+      );
+      setOptionCompanyTypes(OptionDataCompanyType);
+    };
+
+    fetchOptionData();
+  }, []);
+
+  // end select data
+
+  // setup option list area
+  const [OptionAreaProvices, setOptionAreaProvices] = useState<OptionData[]>(
+    listAreaProvinces.map((x) => ({
+      label: x.name,
+      value: x.id,
+    }))
+  );
+  const [OptionAreaRegencies, setOptionAreaRegencies] = useState<OptionData[]>(
+    []
+  );
+  const [OptionAreaDistricts, setOptionAreaDistricts] = useState<OptionData[]>(
+    []
+  );
+  const [OptionAreaVillages, setOptionAreaVillages] = useState<OptionData[]>(
+    []
+  );
+
+  const SetOptionListAreaRegencies = (id: string | null) => {
+    console.log(id);
+    setOptionAreaRegencies([]);
+    if (id) {
+      setOptionAreaRegencies(
+        listAreaRegencies
+          .filter((x) => x.province_id.includes(id))
+          .map((x) => ({
+            label: x.name,
+            value: x.id,
+          }))
+      );
+    }
+  };
+  // end setup option list area
 
   const handlePostalCodeChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -393,132 +344,68 @@ const CompaniesForm: React.FC = () => {
     formik.setFieldValue("estabilishedDate", formatDateToYYYYMMDD(date));
   };
 
-  // Navigation
-  const BackPageAction = () => {
-    navigate(companiesPage);
-  };
-
-  const itemsDummy = Array.from({ length: 100 }, (_, index) => index);
-
   return (
     <>
       <Box>
         <form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
-          <Grid templateColumns="repeat(12, 1fr)" gap={2} pb={2}>
+          <Grid templateColumns="repeat(12, 1fr)" gap={6} pb={2}>
             <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
-              <Flex justifyContent={"start"}>
-                <Button
-                  // colorScheme="primary"
-                  w={{ base: "full", md: "auto" }}
-                  leftIcon={<ArrowBackIcon />}
-                  size={{ base: "lg", md: "md" }}
-                  boxShadow={"lg"}
-                  onClick={BackPageAction}
-                >
-                  Kembali
-                </Button>
+              <Flex justifyContent={"flex-start"}>
+                <Link to={companiesPage}>
+                  <Button
+                    // colorScheme="primary"
+                    w={{ base: "full", md: "auto" }}
+                    leftIcon={<ArrowBackIcon />}
+                    size={{ base: "lg", md: "md" }}
+                  >
+                    Kembali
+                  </Button>
+                </Link>
               </Flex>
             </GridItem>
-            <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
-              <Stack
-                direction={["column", "row"]}
-                w={"full"}
-                justifyContent={"end"}
-              >
-                <Button
-                  colorScheme="blue"
-                  w={{ base: "full", md: "auto" }}
-                  leftIcon={<CheckIcon />}
-                  size={{ base: "lg", md: "md" }}
-                  boxShadow={"lg"}
-                  type={"submit"}
-                >
-                  Simpan Data
-                </Button>
-                <Button
-                  // colorScheme="primary"
-                  w={{ base: "full", md: "auto" }}
-                  leftIcon={<RepeatClockIcon />}
-                  size={{ base: "lg", md: "md" }}
-                  boxShadow={"lg"}
-                  type={"reset"}
-                >
-                  Reset
-                </Button>
-              </Stack>
-            </GridItem>
+            <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}></GridItem>
             <GridItem w={"full"} colSpan={{ base: 12, md: 4 }}>
-              <VStack w={"full"}>
-                <Card borderRadius={borderRadiusSchemes} w={"full"}>
-                  <CardHeader>
-                    <Heading size={"md"}>Logo Instansi/Group</Heading>
-                  </CardHeader>
-                  <CardBody>
-                    <VStack w={"full"}>
-                      {preview ? (
-                        <Image
-                          src={preview}
-                          alt="Image Preview"
-                          width={"full"}
-                          height={"400px"}
-                          objectFit="cover"
-                          borderRadius={borderRadiusSchemes}
-                          borderWidth={1}
-                          borderColor="gray.300"
-                          borderStyle="solid"
-                          boxShadow={"md"}
-                        />
-                      ) : (
-                        <Flex
-                          width={"full"}
-                          height={"400px"}
-                          borderRadius={borderRadiusSchemes}
-                          borderWidth={1}
-                          borderColor="gray.300"
-                          bgColor={"gray.100"}
-                          borderStyle="solid"
-                          boxShadow={"md"}
-                          justifyContent={"center"}
-                        >
-                          <Center>Logo belum ada</Center>
-                        </Flex>
-                      )}
-                      <FormControl
+              <Card borderRadius={borderRadiusSchemes}>
+                <CardHeader>
+                  <Heading size={"md"}>Logo Instansi/Group</Heading>
+                </CardHeader>
+                <CardBody>
+                  <VStack w={"full"}>
+                    {/* {preview && ( */}
+                    <Image
+                      src={preview ? preview : tempCompanyLogo}
+                      alt="Image Preview"
+                      width={"full"}
+                      height={"400px"}
+                      objectFit="cover"
+                      borderRadius={borderRadiusSchemes}
+                      borderWidth={1}
+                      borderColor="gray.300"
+                      borderStyle="solid"
+                      boxShadow={"xl"}
+                    />
+                    {/* )} */}
+                    <FormControl
+                      id="image-upload"
+                      isInvalid={formik.errors.companyLogo ? true : false}
+                    >
+                      <FormLabel>Upload Image </FormLabel>
+                      <Input
                         id="image-upload"
-                        isInvalid={formik.errors.companyLogo ? true : false}
-                      >
-                        <FormLabel>Upload Image </FormLabel>
-                        <Input
-                          id="image-upload"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          // value={formik.values.image}
-                        />
-                        <FormHelperText>
-                          Select an image file to preview and upload. The file
-                          should be less than 5 MB.
-                        </FormHelperText>
-                        {error && <Text color="red.500">{error}</Text>}
-                      </FormControl>
-                    </VStack>
-                  </CardBody>
-                </Card>
-                <Card borderRadius={borderRadiusSchemes} w={"full"} h={"452px"}>
-                  <CardHeader>
-                    <Heading size={"md"}>Tittle</Heading>
-                  </CardHeader>
-                  <CardBody>
-                    <Box style={{ maxHeight: "340px", overflowY: "auto" }}>
-                      {itemsDummy.map((index) => (
-                        <div key={index}>
-                          <p>Item {index + 1}</p> {/* Example content */}
-                        </div>
-                      ))}
-                    </Box>
-                  </CardBody>
-                </Card>
-              </VStack>
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        // value={formik.values.image}
+                      />
+                      <FormHelperText>
+                        Select an image file to preview and upload. The file
+                        should be less than 5 MB.
+                      </FormHelperText>
+                      {error && <Text color="red.500">{error}</Text>}
+                    </FormControl>
+                  </VStack>
+                </CardBody>
+              </Card>
             </GridItem>
             <GridItem w={"full"} colSpan={{ base: 12, md: 8 }}>
               <Card borderRadius={borderRadiusSchemes}>
@@ -557,10 +444,7 @@ const CompaniesForm: React.FC = () => {
                               <Select
                                 className="basic-single"
                                 classNamePrefix="select"
-                                defaultValue={OptionCompanyAsTypes.filter(
-                                  (x) =>
-                                    x.value == formik.values.companyAsTypeId
-                                )}
+                                defaultValue={OptionCompanyAsTypes[0]}
                                 onChange={(e) => {
                                   formik.setFieldValue(
                                     "companyAsTypeId",
@@ -569,7 +453,6 @@ const CompaniesForm: React.FC = () => {
                                 }}
                                 isSearchable={true}
                                 name="companyAsTypeId"
-                                id="companyAsTypeId"
                                 options={OptionCompanyAsTypes}
                               />
                               <FormErrorMessage>
@@ -588,9 +471,7 @@ const CompaniesForm: React.FC = () => {
                               <Select
                                 className="basic-single"
                                 classNamePrefix="select"
-                                defaultValue={OptionCompanyTypes.filter(
-                                  (x) => x.value == formik.values.companyTypeId
-                                )}
+                                defaultValue={OptionCompanyTypes[0]}
                                 onChange={(e) => {
                                   formik.setFieldValue(
                                     "companyTypeId",
@@ -599,7 +480,6 @@ const CompaniesForm: React.FC = () => {
                                 }}
                                 isSearchable={true}
                                 name="companyTypeId"
-                                id="companyTypeId"
                                 options={OptionCompanyTypes}
                               />
                               <FormErrorMessage>
@@ -755,7 +635,7 @@ const CompaniesForm: React.FC = () => {
                               <Select
                                 className="basic-single"
                                 classNamePrefix="select"
-                                defaultValue={OptionAreaRegencies.filter((x) =>
+                                defaultValue={OptionAreaProvices.filter((x) =>
                                   x.label.includes(formik.values.city)
                                 )}
                                 onChange={(e) => {
@@ -781,7 +661,7 @@ const CompaniesForm: React.FC = () => {
                               <Input
                                 id={"postalCode"}
                                 type={"text"}
-                                onChange={handlePostalCodeChange}
+                                onChange={formik.handleChange}
                                 value={formik.values.postalCode}
                                 placeholder="Isi Kode POS"
                               />
@@ -867,16 +747,16 @@ const CompaniesForm: React.FC = () => {
           </Grid>
         </form>
       </Box>
-      {/* <Card borderRadius={borderRadiusSchemes}>
+      <Card borderRadius={borderRadiusSchemes}>
         <CardBody>
           <div style={{ overflowX: "auto" }}>
-            <pre>{JSON.stringify(formik.values, null, 2)}</pre>
+            <pre>{JSON.stringify(formik, null, 2)}</pre>
           </div>
         </CardBody>
-      </Card> */}
+      </Card>
       {/* <Box h={"800px"}></Box> */}
     </>
   );
 };
 
-export default CompaniesForm;
+export default CompaniesFormEdit;
