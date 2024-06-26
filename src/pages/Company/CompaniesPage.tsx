@@ -4,6 +4,7 @@ import {
   useHeaderState,
 } from "../../data/GlobalStates/HeaderaState";
 import {
+  Avatar,
   Badge,
   Box,
   Button,
@@ -23,6 +24,7 @@ import {
   Thead,
   Tr,
   VStack,
+  useStatStyles,
 } from "@chakra-ui/react";
 import { borderRadiusSchemes } from "../../components/themes/colorScheme";
 import { useToastHelper } from "../../helper/ToastMessagesHelper";
@@ -45,7 +47,7 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
 } from "@tanstack/react-table";
-import { AddIcon, EditIcon } from "@chakra-ui/icons";
+import { AddIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import {
   BasicTable,
   ControlTable,
@@ -56,6 +58,7 @@ import {
   companiesFormCreatePage,
   companiesFormEditPage,
 } from "../../data/NavigationUrlConstants";
+import logoDefaultCompany from "../../assets/default-company-logo.png";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
@@ -84,13 +87,17 @@ const CompaniesPage = () => {
 
   const [parameterQueryList, setparameterQueryList] =
     useState<PagesQueryParameter>(initPagesQuery);
-  const [DataCount, setDataCount] = useState(0);
-  const [DataCountTotal, setDataCountTotal] = useState(0);
-  const [totalPages, setTotalPageData] = useState<number | 0>(0);
+  const [totalPages, setTotalPageData] = useState<number>(1);
   const [data, setData] = useState<CompanyData[] | []>([]);
-  const [DataDetail, setDataDetail] = useState<CompanyData | null>(null);
-  const [triggerRefresh, setTriggerRefresh] = useState<number>(0);
+  const [TriggerRefresh, setTriggerRefresh] = useState<number>(0);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [IsLoadingTable, setIsLoadingTable] = useState(false);
+
+  const HandleRefreshData = () => {
+    setData([]);
+    setTotalPageData(1);
+    setTriggerRefresh(TriggerRefresh + 1);
+  };
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -108,25 +115,52 @@ const CompaniesPage = () => {
   const columns = useMemo<ColumnDef<CompanyData>[]>(
     () => [
       {
-        accessorFn: (row) => row.companyId,
-        id: "companyId",
-        cell: (info) => info.getValue(),
-        header: () => <span>Kode Instansi</span>,
-        footer: (props) => props.column.id,
-      },
-      {
         accessorFn: (row) => (
-          <VStack alignItems={"start"}>
-            <Text>{row.name}</Text>
-            <Text
-              fontSize={"xs"}
-              fontWeight={"700"}
-              color={"gray.500"}
-              textTransform={"uppercase"}
-            >
-              {row.companyAsTypeName}
-            </Text>
-          </VStack>
+          <>
+            <Grid templateColumns="repeat(7, 1fr)" gap={5}>
+              <GridItem
+                w={"full"}
+                h={"full"}
+                colSpan={1}
+                justifyContent={"center"}
+                alignItems={"center"}
+              >
+                <Avatar
+                  size="lg"
+                  src={
+                    row.companyLogoBase64 != null
+                      ? `data:image/png;base64,${row.companyLogoBase64}`
+                      : logoDefaultCompany
+                  }
+                  borderWidth={"1px"}
+                  borderColor={"gray.300"}
+                />
+              </GridItem>
+              <GridItem
+                w={"full"}
+                h={"full"}
+                colSpan={6}
+                justifyContent={"center"}
+                alignItems={"center"}
+              >
+                <VStack
+                  alignItems={"start"}
+                  h={"full"}
+                  justifyContent={"center"}
+                >
+                  <Text>{row.name}</Text>
+                  <Text
+                    fontSize={"xs"}
+                    fontWeight={"700"}
+                    color={"gray.500"}
+                    textTransform={"uppercase"}
+                  >
+                    {row.companyAsTypeName}
+                  </Text>
+                </VStack>
+              </GridItem>
+            </Grid>
+          </>
         ),
         id: "name",
         cell: (info) => info.getValue(),
@@ -186,6 +220,7 @@ const CompaniesPage = () => {
     );
     RequestAuthentication.then(function (response: any) {
       if (response.status != HttpStatusCode.Ok) {
+        setIsLoadingTable(false);
         showToast({
           description: `${response.data.message}`,
           statusToast: "warning",
@@ -196,26 +231,27 @@ const CompaniesPage = () => {
       const responseDataList: CompanyData[] = response.data
         .data as CompanyData[];
 
-      setDataCount(response.data.count);
-      setDataCountTotal(response.data.countTotal);
       setData(responseDataList);
       setTotalPageData(
         response.data.countTotal > 0
           ? Math.ceil(response.data.countTotal / pageSize)
           : 1
       );
+      setIsLoadingTable(false);
     }).catch(function (error) {
       showToast({
         description: `Error : ${error.message}`,
         statusToast: "error",
       });
+      setIsLoadingTable(false);
     });
   };
 
   // Load Data
   useEffect(() => {
+    setIsLoadingTable(true);
     RequestListData(parameterQueryList);
-  }, [parameterQueryList]);
+  }, [parameterQueryList, TriggerRefresh]);
 
   const table = useReactTable({
     data,
@@ -250,7 +286,11 @@ const CompaniesPage = () => {
         <Grid templateColumns="repeat(12, 1fr)" gap={6} pb={2}>
           <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}></GridItem>
           <GridItem w={"full"} colSpan={{ base: 12, md: 6 }}>
-            <Flex justifyContent={"flex-end"}>
+            <Stack
+              direction={["column", "row"]}
+              w={"full"}
+              justifyContent={"end"}
+            >
               <Button
                 // colorScheme="primary"
                 w={{ base: "full", md: "auto" }}
@@ -261,7 +301,17 @@ const CompaniesPage = () => {
               >
                 Buat Data Baru
               </Button>
-            </Flex>
+              <Button
+                // colorScheme="primary"
+                w={{ base: "full", md: "auto" }}
+                leftIcon={<RepeatIcon />}
+                size={{ base: "lg", md: "md" }}
+                boxShadow={"lg"}
+                onClick={HandleRefreshData}
+              >
+                Refresh
+              </Button>
+            </Stack>
           </GridItem>
         </Grid>
         <Card borderRadius={borderRadiusSchemes}>
@@ -291,7 +341,7 @@ const CompaniesPage = () => {
                   <TableInputShowPage table={table} />
                 </GridItem>
                 <GridItem colSpan={{ base: 12, md: 12 }}>
-                  <BasicTable table={table} />
+                  <BasicTable table={table} isLoading={IsLoadingTable} />
                 </GridItem>
               </Grid>
             </>
