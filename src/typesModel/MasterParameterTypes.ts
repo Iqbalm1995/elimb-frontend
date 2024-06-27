@@ -1,5 +1,6 @@
 export interface PagesQueryParameter {
   search: string;
+  keyId?: string | null;
   limit: number;
   page: number;
   filterWhere: filterWhereParameter[];

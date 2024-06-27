@@ -115,7 +115,6 @@ export function BasicTable({
                 )}
               </Tbody>
             </Table>
-            <ControlTable table={table} />
           </div>
         </>
       )}

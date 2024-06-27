@@ -62,7 +62,8 @@ import logoDefaultCompany from "../../assets/default-company-logo.png";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
-  page: 1,
+  keyId: null,
+  page: 0,
   limit: 10,
   filterWhere: [],
   fieldOrder: ["name"],
@@ -85,8 +86,8 @@ const CompaniesPage = () => {
     });
   }, []);
 
-  const [parameterQueryList, setparameterQueryList] =
-    useState<PagesQueryParameter>(initPagesQuery);
+  // const [parameterQueryList, setparameterQueryList] =
+  //   useState<PagesQueryParameter>(initPagesQuery);
   const [totalPages, setTotalPageData] = useState<number>(1);
   const [data, setData] = useState<CompanyData[] | []>([]);
   const [TriggerRefresh, setTriggerRefresh] = useState<number>(0);
@@ -248,10 +249,21 @@ const CompaniesPage = () => {
   };
 
   // Load Data
+
+  // Load Data
   useEffect(() => {
+    const dataPayload: PagesQueryParameter = {
+      search: globalFilter,
+      keyId: null,
+      limit: pageSize,
+      page: pageIndex + 1,
+      filterWhere: initPagesQuery.filterWhere,
+      fieldOrder: initPagesQuery.fieldOrder,
+      orderDir: initPagesQuery.orderDir,
+    };
     setIsLoadingTable(true);
-    RequestListData(parameterQueryList);
-  }, [parameterQueryList, TriggerRefresh]);
+    RequestListData(dataPayload);
+  }, [TriggerRefresh, globalFilter, pageSize, pageIndex]);
 
   const table = useReactTable({
     data,
@@ -342,6 +354,7 @@ const CompaniesPage = () => {
                 </GridItem>
                 <GridItem colSpan={{ base: 12, md: 12 }}>
                   <BasicTable table={table} isLoading={IsLoadingTable} />
+                  <ControlTable table={table} />
                 </GridItem>
               </Grid>
             </>
