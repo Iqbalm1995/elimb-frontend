@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
 import { useToastHelper } from "../../helper/ToastMessagesHelper";
 import { CompanyData } from "../../typesModel/CompaniesTypes";
-import { PagesQueryParameter } from "../../typesModel/MasterParameterTypes";
-import { WasteData } from "../../typesModel/WastesTypes";
+import { VehicleData } from "../../typesModel/VehiclesTypes";
 import {
   ColumnDef,
   PaginationState,
@@ -14,6 +13,10 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import {
+  PagesQueryParameter,
+  filterWhereParameter,
+} from "../../typesModel/MasterParameterTypes";
 import {
   Badge,
   Box,
@@ -28,16 +31,16 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { borderRadiusSchemes } from "../../components/themes/colorScheme";
+import { GiTruck } from "react-icons/gi";
 import { AddIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
-import { PostWastesCompaniesListServices } from "../../services/WastesServices";
 import { HttpStatusCode } from "axios";
+import { PostVehiclesListServices } from "../../services/VehiclesServices";
 import {
   BasicTable,
   ControlTable,
   TableInputShowPage,
 } from "../../components/TableComponents";
-import { borderRadiusSchemes } from "../../components/themes/colorScheme";
-import { GiHazardSign } from "react-icons/gi";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
@@ -45,11 +48,11 @@ const initPagesQuery: PagesQueryParameter = {
   page: 1,
   limit: 5,
   filterWhere: [],
-  fieldOrder: ["name"],
+  fieldOrder: ["vehicleName"],
   orderDir: "asc",
 };
 
-const CompanyWasteData = ({
+const CompaniesVehicles = ({
   CompanyData,
 }: {
   CompanyData: CompanyData | null;
@@ -57,7 +60,7 @@ const CompanyWasteData = ({
   const showToast = useToastHelper();
   const AuthData = useAuthenticationState((state: any) => state.AuthData);
   const [totalPages, setTotalPageData] = useState<number>(1);
-  const [data, setData] = useState<WasteData[] | []>([]);
+  const [data, setData] = useState<VehicleData[] | []>([]);
   const [TriggerRefresh, setTriggerRefresh] = useState<number>(0);
   const [globalFilter, setGlobalFilter] = useState("");
   const [IsLoadingTable, setIsLoadingTable] = useState(false);
@@ -81,7 +84,7 @@ const CompanyWasteData = ({
     [pageIndex, pageSize]
   );
 
-  const columns = useMemo<ColumnDef<WasteData>[]>(
+  const columns = useMemo<ColumnDef<VehicleData>[]>(
     () => [
       {
         accessorFn: (row) => (
@@ -98,13 +101,13 @@ const CompanyWasteData = ({
                   borderRadius={borderRadiusSchemes}
                   // bgColor={specialColorDark}
                   bgGradient={"linear(to-b, #2aaeff, #0082d1)"}
-                  p={3}
+                  p={2}
                   w={"50px"}
                   h={"50px"}
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <GiHazardSign size={"5em"} color={"white"} />
+                  <GiTruck size={"5em"} color={"white"} />
                 </Flex>
               </GridItem>
               <GridItem
@@ -119,14 +122,14 @@ const CompanyWasteData = ({
                   h={"full"}
                   justifyContent={"center"}
                 >
-                  <Text fontWeight={500}>{row.name}</Text>
+                  <Text fontWeight={500}>{row.vehicleName}</Text>
                   <Text
                     textStyle={"italic"}
                     fontWeight={300}
                     fontSize={11}
                     color={"gray.400"}
                   >
-                    #{row.code}
+                    #{row.licenseNumberPlate}
                   </Text>
                 </VStack>
               </GridItem>
@@ -183,7 +186,7 @@ const CompanyWasteData = ({
   );
 
   const RequestListData = (payload: PagesQueryParameter) => {
-    var RequestAuthentication = PostWastesCompaniesListServices(
+    var RequestAuthentication = PostVehiclesListServices(
       payload,
       AuthData.apiKey
     );
@@ -197,7 +200,8 @@ const CompanyWasteData = ({
         return;
       }
 
-      const responseDataList: WasteData[] = response.data.data as WasteData[];
+      const responseDataList: VehicleData[] = response.data
+        .data as VehicleData[];
 
       setData(responseDataList);
       setTotalPageData(
@@ -214,21 +218,6 @@ const CompanyWasteData = ({
       setIsLoadingTable(false);
     });
   };
-
-  // Load Data
-  useEffect(() => {
-    const dataPayload: PagesQueryParameter = {
-      search: globalFilter,
-      keyId: CompanyData ? CompanyData.id : null,
-      limit: pageSize,
-      page: pageIndex + 1,
-      filterWhere: initPagesQuery.filterWhere,
-      fieldOrder: initPagesQuery.fieldOrder,
-      orderDir: initPagesQuery.orderDir,
-    };
-    setIsLoadingTable(true);
-    RequestListData(dataPayload);
-  }, [TriggerRefresh, globalFilter, pageSize, pageIndex]);
 
   const table = useReactTable({
     data,
@@ -252,16 +241,34 @@ const CompanyWasteData = ({
     manualPagination: true,
   });
 
+  // Load Data
+  useEffect(() => {
+    const filterWhereData: filterWhereParameter[] = [
+      {
+        field: "companyId",
+        operator: "=",
+        value: CompanyData ? CompanyData.id : "",
+      },
+    ];
+
+    const dataPayload: PagesQueryParameter = {
+      search: globalFilter,
+      keyId: null,
+      limit: pageSize,
+      page: pageIndex + 1,
+      filterWhere: filterWhereData,
+      fieldOrder: initPagesQuery.fieldOrder,
+      orderDir: initPagesQuery.orderDir,
+    };
+    setIsLoadingTable(true);
+    RequestListData(dataPayload);
+  }, [TriggerRefresh, globalFilter, pageSize, pageIndex]);
+
   return (
     <>
       <VStack w={"full"}>
         <Flex w={"full"}>
-          <Text>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
-            inventore adipisci porro incidunt doloremque eaque repellendus?
-            Quisquam quis temporibus cumque magni veritatis nemo repellendus
-            odit vel aliquam repellat, pariatur minus!
-          </Text>
+          <Text>Vehicles</Text>
         </Flex>
         <Box w={"full"}>
           <Grid templateColumns="repeat(12, 1fr)" gap={6} pb={2}>
@@ -335,4 +342,4 @@ const CompanyWasteData = ({
   );
 };
 
-export default CompanyWasteData;
+export default CompaniesVehicles;

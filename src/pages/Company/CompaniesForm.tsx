@@ -62,6 +62,8 @@ import tempCompanyLogo from "../../assets/Company.png";
 import {
   KeyOptionDataCompanyAsType,
   KeyOptionDataCompanyType,
+  company_as_types_group,
+  company_as_types_transporter,
 } from "../../data/ApplicationConstants";
 import { RequestOptionDataGroupByGroupCode } from "../../data/OptionData/OptionDataValues";
 import { OptionData } from "../../typesModel/OptionValuesTypes";
@@ -85,6 +87,7 @@ import { GrDocumentText } from "react-icons/gr";
 import { GiChemicalDrop, GiHazardSign } from "react-icons/gi";
 import { LabelFeatured1 } from "../../components/_MasterComponents";
 import CompanyWasteData from "./CompanyWasteData";
+import CompaniesVehicles from "./CompaniesVehicles";
 
 const formInputInitial: CompanyDataForm = {
   id: null,
@@ -524,7 +527,12 @@ const CompaniesForm: React.FC = () => {
                     </VStack>
                   </CardBody>
                 </Card>
-                <Card borderRadius={borderRadiusSchemes} w={"full"} h={"452px"}>
+                <Card
+                  borderRadius={borderRadiusSchemes}
+                  w={"full"}
+                  h={"452px"}
+                  display={"none"}
+                >
                   <CardHeader>
                     <Heading size={"md"}>Dokumen Legalisasi Instansi</Heading>
                   </CardHeader>
@@ -938,22 +946,25 @@ const CompaniesForm: React.FC = () => {
                         pb={2}
                         style={{ maxHeight: "340px", overflowY: "auto" }}
                       >
-                        <Tab
-                          _selected={{ color: "white", bg: specialColor }}
-                          borderRadius={borderRadiusSchemes}
-                        >
-                          <HStack>
-                            <Text>Limbah</Text>
-                            <Badge
-                              variant="solid"
-                              colorScheme="red"
-                              borderRadius={borderRadiusSchemes}
-                              px={2}
-                            >
-                              12
-                            </Badge>
-                          </HStack>
-                        </Tab>
+                        {Data?.companyAsTypeId == company_as_types_group && (
+                          <Tab
+                            _selected={{ color: "white", bg: specialColor }}
+                            borderRadius={borderRadiusSchemes}
+                          >
+                            <HStack>
+                              <Text>Limbah</Text>
+                              <Badge
+                                variant="solid"
+                                colorScheme="red"
+                                borderRadius={borderRadiusSchemes}
+                                px={2}
+                              >
+                                12
+                              </Badge>
+                            </HStack>
+                          </Tab>
+                        )}
+
                         <Tab
                           _selected={{ color: "white", bg: specialColor }}
                           borderRadius={borderRadiusSchemes}
@@ -970,22 +981,25 @@ const CompaniesForm: React.FC = () => {
                             </Badge>
                           </HStack>
                         </Tab>
-                        <Tab
-                          _selected={{ color: "white", bg: specialColor }}
-                          borderRadius={borderRadiusSchemes}
-                        >
-                          <HStack>
-                            <Text>Kendaraan</Text>
-                            <Badge
-                              variant="solid"
-                              colorScheme="red"
-                              borderRadius={borderRadiusSchemes}
-                              px={2}
-                            >
-                              5
-                            </Badge>
-                          </HStack>
-                        </Tab>
+                        {Data?.companyAsTypeId ==
+                          company_as_types_transporter && (
+                          <Tab
+                            _selected={{ color: "white", bg: specialColor }}
+                            borderRadius={borderRadiusSchemes}
+                          >
+                            <HStack>
+                              <Text>Kendaraan</Text>
+                              <Badge
+                                variant="solid"
+                                colorScheme="red"
+                                borderRadius={borderRadiusSchemes}
+                                px={2}
+                              >
+                                5
+                              </Badge>
+                            </HStack>
+                          </Tab>
+                        )}
                         <Tab
                           _selected={{ color: "white", bg: specialColor }}
                           borderRadius={borderRadiusSchemes}
@@ -1004,18 +1018,12 @@ const CompaniesForm: React.FC = () => {
                         </Tab>
                       </TabList>
                       <TabPanels>
-                        <TabPanel>
-                          <CompanyWasteData CompanyData={Data} />
-                        </TabPanel>
-                        <TabPanel>
-                          <p>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Quisquam consectetur, laudantium aut, vel
-                            nostrum reiciendis neque quidem aspernatur fugiat
-                            doloribus laboriosam labore officiis! Cum quis enim
-                            aspernatur nam in perspiciatis!
-                          </p>
-                        </TabPanel>
+                        {Data?.companyAsTypeId == company_as_types_group && (
+                          <TabPanel>
+                            {/* LIMBAH */}
+                            <CompanyWasteData CompanyData={Data} />
+                          </TabPanel>
+                        )}
                         <TabPanel>
                           <p>
                             Lorem ipsum dolor sit amet, consectetur adipisicing
@@ -1025,6 +1033,13 @@ const CompaniesForm: React.FC = () => {
                             aspernatur nam in perspiciatis!
                           </p>
                         </TabPanel>
+                        {Data?.companyAsTypeId ==
+                          company_as_types_transporter && (
+                          <TabPanel>
+                            {/* KENDARAAN */}
+                            <CompaniesVehicles CompanyData={Data} />
+                          </TabPanel>
+                        )}
                         <TabPanel>
                           <p>
                             Lorem ipsum dolor sit amet, consectetur adipisicing
