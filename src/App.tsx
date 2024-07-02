@@ -11,11 +11,15 @@ import {
   companiesFormEditPage,
   companiesPage,
   dashboardPage,
+  optionDataDetailMenu,
+  optionDataListMenu,
   orderCreate,
   orderList,
 } from "./data/NavigationUrlConstants";
 import OrderPage from "./pages/Order/OrderPage";
 import AuthenticationValidation from "./pages/Auth/AuthenticationValidation";
+import OptionDataPage from "./pages/OptionData/OptionDataPage";
+import OptionDataDetail from "./pages/OptionData/OptionDataDetail";
 
 const AuthrenticationPage = React.lazy(
   () => import("./pages/Auth/AuthenticationPage")
@@ -207,6 +211,14 @@ const router = [
   {
     path: companiesFormEditPage,
     element: <CompaniesForm />,
+  },
+  {
+    path: optionDataListMenu,
+    element: <OptionDataPage />,
+  },
+  {
+    path: optionDataDetailMenu,
+    element: <OptionDataDetail />,
   },
 ];
 

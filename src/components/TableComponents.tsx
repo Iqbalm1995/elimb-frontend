@@ -86,7 +86,14 @@ export function BasicTable({
                           fontSize={15}
                           color={"gray.800"}
                         >
-                          {index + 1}
+                          {/* {index + 1},
+                          {table.getState().pagination.pageIndex + 1},
+                          {table.options.state.pagination.pageIndex},
+                          {table.options.state.pagination.pageSize}, */}
+                          {table.options.state.pagination.pageSize *
+                            table.options.state.pagination.pageIndex +
+                            index +
+                            1}
                         </Td>
                         {row.getVisibleCells().map((cell: any) => {
                           return (
@@ -108,13 +115,16 @@ export function BasicTable({
                   })
                 ) : (
                   <Tr>
-                    <Td colSpan={table.options.columns.length + 1}>
+                    {/* <Td colSpan={table.options.columns.length + 1}> */}
+                    <Td colSpan={table.options.columns.length}>
                       <Flex justifyContent={"center"}>Data belum ada</Flex>
                     </Td>
                   </Tr>
                 )}
               </Tbody>
             </Table>
+
+            {/* <pre>{JSON.stringify(table, null, 2)}</pre> */}
           </div>
         </>
       )}
@@ -210,7 +220,7 @@ export function TableInputShowPage({ table }: any) {
           table.setPageSize(Number(e.target.value));
         }}
       >
-        {[10, 20, 30, 40, 50].map((pageSize) => (
+        {[5, 10, 20, 30, 40, 50].map((pageSize) => (
           <option key={pageSize} value={pageSize}>
             {pageSize}
           </option>

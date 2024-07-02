@@ -40,6 +40,7 @@ import {
   contractHistory,
   contractList,
   dashboardPage,
+  optionDataListMenu,
   orderCreate,
   orderHistory,
   orderList,
@@ -123,7 +124,19 @@ export const LinkNavigations: Array<LinkItemProps> = [
     ],
   },
   { name: "Favourites", icon: FiStar, subLinks: [], pathUrl: "/fav" },
-  { name: "Settings", icon: FiSettings, subLinks: [], pathUrl: "/settings" },
+  {
+    name: "Settings",
+    icon: FiSettings,
+    subLinks: [
+      {
+        name: "Master Data Option",
+        icon: FiCircle,
+        pathUrl: optionDataListMenu,
+        subLinks: [],
+      },
+    ],
+    pathUrl: "/settings",
+  },
   { name: "Blank Page", icon: RiCircleLine, subLinks: [], pathUrl: blankPage },
 ];
 

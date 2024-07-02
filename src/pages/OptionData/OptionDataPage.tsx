@@ -1,77 +1,96 @@
-import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
 import {
   HeaderState,
   useHeaderState,
 } from "../../data/GlobalStates/HeaderaState";
+import { useToastHelper } from "../../helper/ToastMessagesHelper";
+import { PagesQueryParameter } from "../../typesModel/MasterParameterTypes";
+import { useEffect, useMemo, useState } from "react";
 import {
-  Avatar,
-  Badge,
+  OptionGroupData,
+  OptionGroupForm,
+} from "../../typesModel/OptionValuesTypes";
+import {
+  ColumnDef,
+  PaginationState,
+  getCoreRowModel,
+  getFacetedMinMaxValues,
+  getFacetedUniqueValues,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { PostOptionDataListServices } from "../../services/OptionDataServices";
+import { HttpStatusCode } from "axios";
+import {
   Box,
   Button,
   Card,
   CardBody,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Grid,
   GridItem,
-  HStack,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Stack,
-  Table,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
   VStack,
-  useStatStyles,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { borderRadiusSchemes } from "../../components/themes/colorScheme";
-import { useToastHelper } from "../../helper/ToastMessagesHelper";
-import { PagesQueryParameter } from "../../typesModel/MasterParameterTypes";
-import { PostCompaniesListServices } from "../../services/CompaniesServices";
-import { HttpStatusCode } from "axios";
-import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
-import { CompanyData } from "../../typesModel/CompaniesTypes";
+import { optionDataDetailMenu } from "../../data/NavigationUrlConstants";
 import {
-  Column,
-  Table as ReactTable,
-  PaginationState,
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  ColumnDef,
-  OnChangeFn,
-  flexRender,
-  getFacetedUniqueValues,
-  getFacetedMinMaxValues,
-} from "@tanstack/react-table";
-import { AddIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
+  AddIcon,
+  CheckIcon,
+  EditIcon,
+  RepeatClockIcon,
+  RepeatIcon,
+} from "@chakra-ui/icons";
+import { borderRadiusSchemes } from "../../components/themes/colorScheme";
 import {
   BasicTable,
   ControlTable,
   TableInputShowPage,
 } from "../../components/TableComponents";
-import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
-  companiesFormCreatePage,
-  companiesFormEditPage,
-} from "../../data/NavigationUrlConstants";
-import logoDefaultCompany from "../../assets/default-company-logo.png";
+  RequestInsertDataOptionGroup,
+  RequestUpdateDataOptionGroup,
+} from "../../data/OptionData/OptionDataHook";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
   keyId: null,
   page: 0,
-  limit: 10,
+  limit: 5,
   filterWhere: [],
   fieldOrder: ["name"],
   orderDir: "asc",
 };
 
-const CompaniesPage = () => {
+const formInputInitial: OptionGroupForm = {
+  id: null,
+  code: "",
+  name: "",
+};
+
+const FormSchema = Yup.object().shape({
+  code: Yup.string().required("Wajib di isi!"),
+  name: Yup.string().required("Wajib di isi!"),
+});
+
+const OptionDataPage = () => {
   const showToast = useToastHelper();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const setHeaderActive = useHeaderState(
     (state: HeaderState) => state.setHeaderActive
   );
@@ -81,15 +100,13 @@ const CompaniesPage = () => {
   useEffect(() => {
     // set header title page
     setHeaderActive({
-      tittle: "Instansi",
-      breadcrumbItems: ["Pages", "Instansi"],
+      tittle: "Master Data Option",
+      breadcrumbItems: ["Pages", "Setting", "Master Data Option"],
     });
   }, []);
 
-  // const [parameterQueryList, setparameterQueryList] =
-  //   useState<PagesQueryParameter>(initPagesQuery);
   const [totalPages, setTotalPageData] = useState<number>(1);
-  const [data, setData] = useState<CompanyData[] | []>([]);
+  const [data, setData] = useState<OptionGroupData[] | []>([]);
   const [TriggerRefresh, setTriggerRefresh] = useState<number>(0);
   const [globalFilter, setGlobalFilter] = useState("");
   const [IsLoadingTable, setIsLoadingTable] = useState(false);
@@ -102,7 +119,7 @@ const CompaniesPage = () => {
 
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
 
   const pagination = useMemo(
@@ -113,74 +130,20 @@ const CompaniesPage = () => {
     [pageIndex, pageSize]
   );
 
-  const columns = useMemo<ColumnDef<CompanyData>[]>(
+  const columns = useMemo<ColumnDef<OptionGroupData>[]>(
     () => [
       {
-        accessorFn: (row) => (
-          <>
-            <Grid templateColumns="repeat(7, 1fr)" gap={5}>
-              <GridItem
-                w={"full"}
-                h={"full"}
-                colSpan={1}
-                justifyContent={"center"}
-                alignItems={"center"}
-              >
-                <Avatar
-                  size="lg"
-                  src={
-                    row.companyLogoBase64 != null
-                      ? `data:image/png;base64,${row.companyLogoBase64}`
-                      : logoDefaultCompany
-                  }
-                  borderWidth={"1px"}
-                  borderColor={"gray.300"}
-                />
-              </GridItem>
-              <GridItem
-                w={"full"}
-                h={"full"}
-                colSpan={6}
-                justifyContent={"center"}
-                alignItems={"center"}
-              >
-                <VStack
-                  alignItems={"start"}
-                  h={"full"}
-                  justifyContent={"center"}
-                >
-                  <Text>{row.name}</Text>
-                  <Text
-                    fontSize={"xs"}
-                    fontWeight={"700"}
-                    color={"gray.500"}
-                    textTransform={"uppercase"}
-                  >
-                    {row.companyAsTypeName}
-                  </Text>
-                </VStack>
-              </GridItem>
-            </Grid>
-          </>
-        ),
-        id: "name",
+        accessorFn: (row) => row.code,
+        id: "code",
         cell: (info) => info.getValue(),
-        header: () => <span>Nama Instansi</span>,
+        header: () => <span>Kode Group</span>,
         footer: (props) => props.column.id,
       },
       {
-        accessorFn: (row) => (
-          <Flex justifyContent="start">
-            {row.isActive == "1" ? (
-              <Badge colorScheme="green">AKTIF</Badge>
-            ) : (
-              <Badge colorScheme="red">NON AKTIF</Badge>
-            )}
-          </Flex>
-        ),
-        id: "status",
+        accessorFn: (row) => row.name,
+        id: "name",
         cell: (info) => info.getValue(),
-        header: () => <span>Status</span>,
+        header: () => <span>Nama Group</span>,
         footer: (props) => props.column.id,
       },
       {
@@ -188,7 +151,7 @@ const CompaniesPage = () => {
         cell: (info) => (
           <>
             <Flex justifyContent="end">
-              <Link to={`${companiesFormEditPage}?id=${info.row.original.id}`}>
+              <Link to={`${optionDataDetailMenu}?id=${info.row.original.id}`}>
                 <Button
                   // isDisabled={allowEditData}
                   leftIcon={<EditIcon />}
@@ -215,7 +178,7 @@ const CompaniesPage = () => {
   );
 
   const RequestListData = (payload: PagesQueryParameter) => {
-    var RequestAuthentication = PostCompaniesListServices(
+    var RequestAuthentication = PostOptionDataListServices(
       payload,
       AuthData.apiKey
     );
@@ -229,8 +192,8 @@ const CompaniesPage = () => {
         return;
       }
 
-      const responseDataList: CompanyData[] = response.data
-        .data as CompanyData[];
+      const responseDataList: OptionGroupData[] = response.data
+        .data as OptionGroupData[];
 
       setData(responseDataList);
       setTotalPageData(
@@ -285,9 +248,63 @@ const CompaniesPage = () => {
     manualPagination: true,
   });
 
-  // Navigation
-  const CreatePageAction = () => {
-    navigate(companiesFormCreatePage);
+  // FORM CODE
+  // const [DataForm, setDataForm] = useState<OptionGroupForm>(formInputInitial);
+  // formik config
+  const formik = useFormik({
+    initialValues: formInputInitial,
+    validationSchema: FormSchema,
+    validateOnChange: false,
+    validateOnBlur: false,
+    onReset: () => {
+      formik.setValues(formInputInitial);
+    },
+    onSubmit: (values) => {
+      console.log("SUBMITED");
+      console.log(values);
+
+      HandleSubmit(values);
+      HandleRefreshData();
+      onClose();
+      formik.handleReset();
+    },
+  });
+  // end formik config
+
+  // save data
+  const HandleSubmit = async (data: OptionGroupForm) => {
+    const token = AuthData.apiKey;
+    if (data.id == null) {
+      // Add
+      console.log(data);
+      let SaveData = await RequestInsertDataOptionGroup(data, token);
+      if (SaveData.status == true) {
+        showToast({
+          description: SaveData.message,
+          statusToast: "success",
+        });
+      } else {
+        showToast({
+          description: SaveData.message,
+          statusToast: "error",
+        });
+      }
+    } else {
+      // Edit
+      console.log(data);
+      let SaveData = await RequestUpdateDataOptionGroup(data, token);
+      if (SaveData.status == true) {
+        showToast({
+          description: SaveData.message,
+          statusToast: "success",
+        });
+      } else {
+        showToast({
+          description: SaveData.message,
+          statusToast: "error",
+        });
+      }
+    }
   };
 
   return (
@@ -307,7 +324,8 @@ const CompaniesPage = () => {
                 leftIcon={<AddIcon />}
                 size={{ base: "lg", md: "md" }}
                 boxShadow={"lg"}
-                onClick={CreatePageAction}
+                // onClick={CreatePageAction}
+                onClick={onOpen}
               >
                 Buat Data Baru
               </Button>
@@ -359,8 +377,78 @@ const CompaniesPage = () => {
           </CardBody>
         </Card>
       </Box>
+      <Modal
+        onClose={onClose}
+        isOpen={isOpen}
+        scrollBehavior={"inside"}
+        size={"xl"}
+      >
+        <form onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Buat Option Data Baru</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack>
+                <FormControl
+                  isInvalid={formik.errors.code ? true : false}
+                  isRequired
+                >
+                  <FormLabel>Code Group</FormLabel>
+                  <Input
+                    id={"code"}
+                    type={"text"}
+                    onChange={formik.handleChange}
+                    value={formik.values.code}
+                    placeholder="code-group"
+                  />
+                  <FormErrorMessage>{formik.errors.code}</FormErrorMessage>
+                </FormControl>
+                <FormControl
+                  isInvalid={formik.errors.name ? true : false}
+                  isRequired
+                >
+                  <FormLabel>Nama Group</FormLabel>
+                  <Input
+                    id={"name"}
+                    type={"text"}
+                    onChange={formik.handleChange}
+                    value={formik.values.name}
+                    placeholder="Nama Group"
+                  />
+                  <FormErrorMessage>{formik.errors.name}</FormErrorMessage>
+                </FormControl>
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Stack direction={"row"}>
+                <Button
+                  colorScheme="blue"
+                  w={{ base: "full", md: "auto" }}
+                  leftIcon={<CheckIcon />}
+                  size={{ base: "lg", md: "md" }}
+                  boxShadow={"lg"}
+                  type={"submit"}
+                >
+                  Simpan Data
+                </Button>
+                <Button
+                  // colorScheme="primary"
+                  w={{ base: "full", md: "auto" }}
+                  leftIcon={<RepeatClockIcon />}
+                  size={{ base: "lg", md: "md" }}
+                  boxShadow={"lg"}
+                  type={"reset"}
+                >
+                  Reset
+                </Button>
+              </Stack>
+            </ModalFooter>
+          </ModalContent>
+        </form>
+      </Modal>
     </>
   );
 };
 
-export default CompaniesPage;
+export default OptionDataPage;

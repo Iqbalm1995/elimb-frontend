@@ -31,3 +31,16 @@ export const mapperOptionData = (data: OptionValueData[]): OptionData[] => {
     value: x.id,
   }));
 };
+
+export interface OptionGroupForm {
+  id?: string | null;
+  code: string;
+  name: string;
+}
+
+export interface OptionValueForm {
+  id?: string | null;
+  optionGroupId: string;
+  code: string;
+  name: string;
+}

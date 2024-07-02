@@ -31,11 +31,7 @@ import {
 import { AddIcon, EditIcon, RepeatIcon } from "@chakra-ui/icons";
 import { PostWastesCompaniesListServices } from "../../services/WastesServices";
 import { HttpStatusCode } from "axios";
-import {
-  BasicTable,
-  ControlTable,
-  TableInputShowPage,
-} from "../../components/TableComponents";
+import { BasicTable, ControlTable } from "../../components/TableComponents";
 import { borderRadiusSchemes } from "../../components/themes/colorScheme";
 import { GiHazardSign } from "react-icons/gi";
 

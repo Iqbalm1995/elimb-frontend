@@ -17,3 +17,7 @@ export const orderHistory: string = "/order-history";
 export const contractCreate: string = "/contract-create";
 export const contractList: string = "/contract-list";
 export const contractHistory: string = "/contract-history";
+
+// option data
+export const optionDataListMenu: string = "/option-data-list";
+export const optionDataDetailMenu: string = "/option-data-detail";
