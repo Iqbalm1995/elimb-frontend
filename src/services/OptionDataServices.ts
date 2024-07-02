@@ -31,6 +31,29 @@ export async function PostOptionDataListServices(
   }
 }
 
+export async function PostOptionValuesListServices(
+  data: PagesQueryParameter,
+  token: string
+) {
+  const urlGet = `v1/OptionData/values/list`;
+
+  try {
+    return await axios.post(urlGet, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      // console.error("Error response data:", error.response.data);
+      return error.response;
+    } else {
+      // console.error("Unexpected error:", error);
+      return error;
+    }
+  }
+}
+
 export async function GetOptionDataGroupByGroupId(
   groupId: string,
   token: string

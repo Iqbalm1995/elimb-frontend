@@ -34,6 +34,7 @@ import {
   FormLabel,
   Grid,
   GridItem,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -50,9 +51,11 @@ import { optionDataDetailMenu } from "../../data/NavigationUrlConstants";
 import {
   AddIcon,
   CheckIcon,
+  DeleteIcon,
   EditIcon,
   RepeatClockIcon,
   RepeatIcon,
+  ViewIcon,
 } from "@chakra-ui/icons";
 import { borderRadiusSchemes } from "../../components/themes/colorScheme";
 import {
@@ -63,9 +66,11 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
+  RequestDeleteDataOptionGroup,
   RequestInsertDataOptionGroup,
   RequestUpdateDataOptionGroup,
 } from "../../data/OptionData/OptionDataHook";
+import { ConfirmationDialog } from "../../components/ConfirmationDialog";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
@@ -151,20 +156,48 @@ const OptionDataPage = () => {
         cell: (info) => (
           <>
             <Flex justifyContent="end">
-              <Link to={`${optionDataDetailMenu}?id=${info.row.original.id}`}>
+              <HStack>
                 <Button
                   // isDisabled={allowEditData}
-                  leftIcon={<EditIcon />}
                   colorScheme="primary"
                   variant="solid"
                   size={"sm"}
-                  // onClick={() => {
-                  //   console.log(info.row.original);
-                  // }}
+                  onClick={() => {
+                    // console.log(info.row.original);
+                    HandleEditData({
+                      id: info.row.original.id,
+                      code: info.row.original.code,
+                      name: info.row.original.name,
+                    });
+                  }}
                 >
-                  Detail
+                  <EditIcon />
                 </Button>
-              </Link>
+                <Button
+                  colorScheme="red"
+                  variant="solid"
+                  size={"sm"}
+                  onClick={() => {
+                    console.log(info.row.original.id);
+                    handleVerifikasi(info.row.original.id);
+                  }}
+                >
+                  <DeleteIcon />
+                </Button>
+                <Link to={`${optionDataDetailMenu}?id=${info.row.original.id}`}>
+                  <Button
+                    // isDisabled={allowEditData}
+                    colorScheme="gray"
+                    variant="solid"
+                    size={"sm"}
+                    // onClick={() => {
+                    //   console.log(info.row.original);
+                    // }}
+                  >
+                    <ViewIcon />
+                  </Button>
+                </Link>
+              </HStack>
             </Flex>
           </>
         ),
@@ -264,12 +297,17 @@ const OptionDataPage = () => {
       console.log(values);
 
       HandleSubmit(values);
-      HandleRefreshData();
       onClose();
-      formik.handleReset();
+      formik.setValues(formInputInitial);
     },
   });
   // end formik config
+
+  const HandleEditData = (data: OptionGroupForm) => {
+    formik.setValues(data);
+    onOpen();
+    console.log(data);
+  };
 
   // save data
   const HandleSubmit = async (data: OptionGroupForm) => {
@@ -289,6 +327,7 @@ const OptionDataPage = () => {
           statusToast: "error",
         });
       }
+      HandleRefreshData();
     } else {
       // Edit
       console.log(data);
@@ -304,7 +343,48 @@ const OptionDataPage = () => {
           statusToast: "error",
         });
       }
+      HandleRefreshData();
     }
+  };
+
+  // Dialog Action
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const handleDialogTrigger = () => {
+    setOpenConfirmDialog(!openConfirmDialog);
+  };
+
+  const handleSubmitConfirm = () => {
+    setOpenConfirmDialog(true);
+  };
+
+  const [captionDialog, setCaptionDialog] = useState<string>("");
+  const [questionMsgDialog, setQuestionMsgDialog] = useState<string>("");
+  const [IdDelete, setIdDelete] = useState<string>("");
+
+  const handleVerifikasi = (id: string) => {
+    setIdDelete(id);
+    setQuestionMsgDialog("Anda yakin akan menghapus data ini?");
+    setCaptionDialog("Hapus");
+    handleSubmitConfirm();
+  };
+
+  const handleDelete = async () => {
+    // RequestDeleteData(IdDelete);
+    const token = AuthData.apiKey;
+    let SaveData = await RequestDeleteDataOptionGroup(IdDelete, token);
+    if (SaveData.status == true) {
+      showToast({
+        description: SaveData.message,
+        statusToast: "success",
+      });
+    } else {
+      showToast({
+        description: SaveData.message,
+        statusToast: "error",
+      });
+    }
+    setIdDelete("");
+    HandleRefreshData();
   };
 
   return (
@@ -325,7 +405,10 @@ const OptionDataPage = () => {
                 size={{ base: "lg", md: "md" }}
                 boxShadow={"lg"}
                 // onClick={CreatePageAction}
-                onClick={onOpen}
+                onClick={() => {
+                  formik.setValues(formInputInitial);
+                  onOpen();
+                }}
               >
                 Buat Data Baru
               </Button>
@@ -390,6 +473,14 @@ const OptionDataPage = () => {
             <ModalCloseButton />
             <ModalBody>
               <VStack>
+                <Input
+                  id={"id"}
+                  type={"text"}
+                  onChange={formik.handleChange}
+                  value={formik.values.id || ""}
+                  display={"none"}
+                  readOnly
+                />
                 <FormControl
                   isInvalid={formik.errors.code ? true : false}
                   isRequired
@@ -447,6 +538,14 @@ const OptionDataPage = () => {
           </ModalContent>
         </form>
       </Modal>
+      {/* Alert Dialog Action */}
+      <ConfirmationDialog
+        isOpenTrigger={openConfirmDialog}
+        action={handleDelete}
+        trigger={handleDialogTrigger}
+        questionMsg={questionMsgDialog}
+        captionMsg={captionDialog}
+      />
     </>
   );
 };

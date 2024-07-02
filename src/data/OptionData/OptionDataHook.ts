@@ -51,10 +51,7 @@ export const RequestUpdateDataOptionGroup = async (
   try {
     const response: any = await PostOptionGroupEditServices(data, token);
 
-    if (
-      response.status !== HttpStatusCode.Ok ||
-      response.status !== HttpStatusCode.Created
-    ) {
+    if (response.status !== HttpStatusCode.Ok) {
       console.log(`Data return : ${response.status}`);
       return {
         status: false,
@@ -85,10 +82,7 @@ export const RequestDeleteDataOptionGroup = async (
   try {
     const response: any = await PostOptionGroupDeleteServices(id, token);
 
-    if (
-      response.status !== HttpStatusCode.Ok ||
-      response.status !== HttpStatusCode.Created
-    ) {
+    if (response.status !== HttpStatusCode.Ok) {
       console.log(`Data return : ${response.status}`);
       return {
         status: false,
@@ -150,10 +144,7 @@ export const RequestUpdateDataOptionValue = async (
   try {
     const response: any = await PostOptionValueEditServices(data, token);
 
-    if (
-      response.status !== HttpStatusCode.Ok ||
-      response.status !== HttpStatusCode.Created
-    ) {
+    if (response.status !== HttpStatusCode.Ok) {
       console.log(`Data return : ${response.status}`);
       return {
         status: false,
@@ -184,10 +175,7 @@ export const RequestDeleteDataOptionValue = async (
   try {
     const response: any = await PostOptionValueDeleteServices(id, token);
 
-    if (
-      response.status !== HttpStatusCode.Ok ||
-      response.status !== HttpStatusCode.Created
-    ) {
+    if (response.status !== HttpStatusCode.Ok) {
       console.log(`Data return : ${response.status}`);
       return {
         status: false,
