@@ -318,9 +318,6 @@ const CompanyWasteData = ({
                       />
                     </Flex>
                   </GridItem>
-                  <GridItem colSpan={{ base: 12, md: 6 }}>
-                    <TableInputShowPage table={table} />
-                  </GridItem>
                   <GridItem colSpan={{ base: 12, md: 12 }}>
                     <BasicTable table={table} isLoading={IsLoadingTable} />
                     <ControlTable table={table} />

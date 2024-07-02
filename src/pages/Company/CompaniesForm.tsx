@@ -54,7 +54,11 @@ import { useToastHelper } from "../../helper/ToastMessagesHelper";
 import { PostCompaniesDetailByIdServices } from "../../services/CompaniesServices";
 import useAuthenticationState from "../../data/GlobalStates/AuthenticationState";
 import { HttpStatusCode } from "axios";
-import { CompanyData, CompanyDataForm } from "../../typesModel/CompaniesTypes";
+import {
+  CompanyData,
+  CompanyDataForm,
+  CompanyRelationCount,
+} from "../../typesModel/CompaniesTypes";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import Select from "react-select";
@@ -140,6 +144,8 @@ const CompaniesForm: React.FC = () => {
   );
   const [EditMode, setEditMode] = useState(false);
   const [Data, setData] = useState<CompanyData | null>(null);
+  const [CompanyRelationCountData, setCompanyRelationCountData] =
+    useState<CompanyRelationCount | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -319,6 +325,8 @@ const CompaniesForm: React.FC = () => {
       const responseDataDetail: CompanyData = response.data.data as CompanyData;
       const responseDataForm: CompanyDataForm = response.data
         .data as CompanyDataForm;
+      const responseCountRelation: CompanyRelationCount = response.data.data
+        .companyRelationCount as CompanyRelationCount;
 
       const getProvinceDataId = OptionAreaProvices.filter(
         (x) => x.label == responseDataDetail.province
@@ -329,6 +337,7 @@ const CompaniesForm: React.FC = () => {
 
       setData(responseDataDetail);
       setDetailData(responseDataForm);
+      setCompanyRelationCountData(responseCountRelation);
       formik.setValues(responseDataForm);
       if (responseDataDetail.companyLogo != null) {
         const urlImage: string =
@@ -950,7 +959,9 @@ const CompaniesForm: React.FC = () => {
                               borderRadius={borderRadiusSchemes}
                               px={2}
                             >
-                              12
+                              {CompanyRelationCountData
+                                ? CompanyRelationCountData.countWastes
+                                : 0}
                             </Badge>
                           </HStack>
                         </Tab>
@@ -966,7 +977,9 @@ const CompaniesForm: React.FC = () => {
                               borderRadius={borderRadiusSchemes}
                               px={2}
                             >
-                              4
+                              {CompanyRelationCountData
+                                ? CompanyRelationCountData.countBranches
+                                : 0}
                             </Badge>
                           </HStack>
                         </Tab>
@@ -982,7 +995,9 @@ const CompaniesForm: React.FC = () => {
                               borderRadius={borderRadiusSchemes}
                               px={2}
                             >
-                              5
+                              {CompanyRelationCountData
+                                ? CompanyRelationCountData.countVehicles
+                                : 0}
                             </Badge>
                           </HStack>
                         </Tab>
@@ -998,7 +1013,9 @@ const CompaniesForm: React.FC = () => {
                               borderRadius={borderRadiusSchemes}
                               px={2}
                             >
-                              35
+                              {CompanyRelationCountData
+                                ? CompanyRelationCountData.countPersonels
+                                : 0}
                             </Badge>
                           </HStack>
                         </Tab>
