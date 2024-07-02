@@ -25,6 +25,15 @@ export interface CompanyData {
   updatedBy: string;
   updatedAt: string;
   documentsCompany: DocumentsCompany[];
+  companyRelationCount?: CompanyRelationCount | null;
+}
+
+export interface CompanyRelationCount {
+  countWastes: 0;
+  countVehicles: 0;
+  countBranches: 0;
+  countPersonels: 0;
+  countContracts: 0;
 }
 
 export interface DocumentsCompany {
