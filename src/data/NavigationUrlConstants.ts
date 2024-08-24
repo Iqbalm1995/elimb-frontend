@@ -14,7 +14,7 @@ export const orderList: string = "/order-list";
 export const orderHistory: string = "/order-history";
 
 // contract
-export const contractCreate: string = "/contract-create";
+export const contractCreate: string = "/contract-register";
 export const contractList: string = "/contract-list";
 export const contractHistory: string = "/contract-history";
 

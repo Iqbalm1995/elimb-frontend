@@ -115,8 +115,8 @@ export function BasicTable({
                   })
                 ) : (
                   <Tr>
-                    {/* <Td colSpan={table.options.columns.length + 1}> */}
-                    <Td colSpan={table.options.columns.length}>
+                    <Td colSpan={table.options.columns.length + 1}>
+                      {/* <Td colSpan={table.options.columns.length}> */}
                       <Flex justifyContent={"center"}>Data belum ada</Flex>
                     </Td>
                   </Tr>
