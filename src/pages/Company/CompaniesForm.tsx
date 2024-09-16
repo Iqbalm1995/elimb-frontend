@@ -900,7 +900,7 @@ const CompaniesForm: React.FC = () => {
                           }
                           isRequired
                         >
-                          <FormLabel>Tabggal Ditetapkan</FormLabel>
+                          <FormLabel>Tanggal Ditetapkan</FormLabel>
                           <SingleDatepicker
                             name="estabilishedDate"
                             date={EstabilishDate}

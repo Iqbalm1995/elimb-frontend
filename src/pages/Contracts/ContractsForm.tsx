@@ -78,13 +78,17 @@ import Select from "react-select";
 import { OptionData } from "../../typesModel/OptionValuesTypes";
 import { PersonnelData } from "../../typesModel/PersonelTypes";
 import { PostPersonelListServices } from "../../services/PersonelServices";
+import { SingleDatepicker } from "../../components/DayzedDatepicker";
+import { formatDateToYYYYMMDD } from "../../helper/MasterHelper";
+import { RequestRegisterDataContract } from "../../data/ContractsData/ContractsHook";
 
 const formInputInitial: ContractRegistrationForm = {
-  contractNumber: "",
-  contractTitle: "",
-  contractDetails: "",
-  startDate: "",
-  endDate: "",
+  contractNumber: "S00001",
+  contractTitle: "Dummy Contract 1",
+  contractDetails:
+    "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dicta est earum eos doloribus, ipsum quibusdam incidunt asperiores harum excepturi optio nulla quas dolore at molestias consequatur reprehenderit architecto! Dicta, nisi.",
+  startDate: formatDateToYYYYMMDD(new Date()),
+  endDate: formatDateToYYYYMMDD(new Date()),
   companyRegPemanfaat: {
     companyId: "",
     personnelId: "",
@@ -142,6 +146,7 @@ const ContractsForm = () => {
     onSubmit: (values) => {
       console.log("SUBMITED");
       console.log(values);
+      HandleSubmit(values);
     },
   });
   // end formik config
@@ -430,6 +435,35 @@ const ContractsForm = () => {
       });
   };
 
+  const [StartContractDate, setStartContractDate] = useState(new Date());
+  const HandlingStartContractDate = (date: Date) => {
+    // console.log(date);
+    formik.setFieldValue("startDate", formatDateToYYYYMMDD(date));
+  };
+
+  const [EndContractDate, setEndContractDate] = useState(new Date());
+  const HandlingEndContractDate = (date: Date) => {
+    // console.log(date);
+    formik.setFieldValue("endDate", formatDateToYYYYMMDD(date));
+  };
+
+  // save data
+  const HandleSubmit = async (data: ContractRegistrationForm) => {
+    const token = AuthData.apiKey;
+    let SaveData = await RequestRegisterDataContract(data, token);
+    if (SaveData.status == true) {
+      showToast({
+        description: SaveData.message,
+        statusToast: "success",
+      });
+    } else {
+      showToast({
+        description: SaveData.message,
+        statusToast: "error",
+      });
+    }
+  };
+
   return (
     <>
       <Box>
@@ -491,7 +525,8 @@ const ContractsForm = () => {
                       >
                         <FormLabel>Nomor Kontrak</FormLabel>
                         <Input
-                          id={"companyId"}
+                          id={"contractNumber"}
+                          name={"contractNumber"}
                           type={"text"}
                           onChange={formik.handleChange}
                           value={formik.values.contractNumber}
@@ -508,7 +543,8 @@ const ContractsForm = () => {
                       >
                         <FormLabel>Judul Kontrak</FormLabel>
                         <Input
-                          id={"name"}
+                          id={"contractTitle"}
+                          name={"contractTitle"}
                           type={"text"}
                           onChange={formik.handleChange}
                           value={formik.values.contractTitle}
@@ -523,7 +559,8 @@ const ContractsForm = () => {
                       >
                         <FormLabel>Deskripsi</FormLabel>
                         <Textarea
-                          id={"bio"}
+                          id={"contractDetails"}
+                          name={"contractDetails"}
                           onChange={formik.handleChange}
                           value={formik.values.contractDetails}
                           placeholder="Deskripsi"
@@ -532,72 +569,119 @@ const ContractsForm = () => {
                           {formik.errors.contractDetails}
                         </FormErrorMessage>
                       </FormControl>
+
+                      <FormControl
+                        isInvalid={formik.errors.startDate ? true : false}
+                        isRequired
+                      >
+                        <FormLabel>Tanggal Mulai Kontrak</FormLabel>
+                        <SingleDatepicker
+                          id="startDate"
+                          name="startDate"
+                          date={StartContractDate}
+                          onDateChange={(e) => {
+                            setStartContractDate(e);
+                            HandlingStartContractDate(e);
+                          }}
+                        />
+                        <FormErrorMessage>
+                          {formik.errors.startDate}
+                        </FormErrorMessage>
+                      </FormControl>
+
+                      <FormControl
+                        isInvalid={formik.errors.endDate ? true : false}
+                        isRequired
+                      >
+                        <FormLabel>Tanggal Akhir Kontrak</FormLabel>
+                        <SingleDatepicker
+                          id="endDate"
+                          name="endDate"
+                          date={EndContractDate}
+                          onDateChange={(e) => {
+                            setEndContractDate(e);
+                            HandlingEndContractDate(e);
+                          }}
+                        />
+                        <FormErrorMessage>
+                          {formik.errors.endDate}
+                        </FormErrorMessage>
+                      </FormControl>
+
                       <Divider py={2} />
                       <>
                         <Card>
                           <CardBody>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegPemanfaat?.companyId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <VStack w={"full"} align={"start"}>
-                                <FormLabel>
-                                  Persahaan Pemanfaat [1] : {SelectedComp1}
-                                </FormLabel>
-                                <CardCompany data={SelectedComp1Detail} />
-                                <Button
-                                  onClick={firstModal.onOpen}
-                                  colorScheme={"blue"}
-                                  mr={3}
-                                  size={"sm"}
-                                >
-                                  Pilih Persahaan Pemanfaat 1
-                                </Button>
-                                <FormErrorMessage>
-                                  {formik.errors.companyRegPemanfaat?.companyId}
-                                </FormErrorMessage>
-                              </VStack>
-                            </FormControl>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegPemanfaat?.personnelId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <FormLabel>PIC Persahaan Pemanfaat</FormLabel>
-                              <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                value={
-                                  OptionComp1PIC.find(
-                                    (option) =>
-                                      option.value ===
-                                      formik.values.companyRegPemanfaat
-                                        .personnelId
-                                  ) || null // Setting the select value to null if not found
+                            <VStack spacing={3}>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegPemanfaat?.companyId
+                                    ? true
+                                    : false
                                 }
-                                onChange={(e) => {
-                                  formik.setFieldValue(
-                                    "companyRegPemanfaat.personnelId",
-                                    e ? e.value : null // Set to null when no option is selected
-                                  );
-                                }}
-                                isSearchable={true}
-                                isClearable={true}
-                                id={"companyRegPemanfaatpersonnelId"}
-                                name={"companyRegPemanfaatpersonnelId"}
-                                options={OptionComp1PIC}
-                              />
-                              <FormErrorMessage>
-                                {formik.errors.companyRegPemanfaat?.personnelId}
-                              </FormErrorMessage>
-                            </FormControl>
+                                isRequired
+                              >
+                                <VStack w={"full"} align={"start"}>
+                                  <FormLabel>
+                                    Persahaan Pemanfaat [1] : {SelectedComp1}
+                                  </FormLabel>
+                                  <CardCompany data={SelectedComp1Detail} />
+                                  <Button
+                                    onClick={firstModal.onOpen}
+                                    colorScheme={"blue"}
+                                    size={"sm"}
+                                    w={"full"}
+                                  >
+                                    Pilih Persahaan Pemanfaat 1
+                                  </Button>
+                                  <FormErrorMessage>
+                                    {
+                                      formik.errors.companyRegPemanfaat
+                                        ?.companyId
+                                    }
+                                  </FormErrorMessage>
+                                </VStack>
+                              </FormControl>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegPemanfaat?.personnelId
+                                    ? true
+                                    : false
+                                }
+                                isRequired
+                              >
+                                <FormLabel>PIC Persahaan Pemanfaat</FormLabel>
+                                <Select
+                                  className="basic-single"
+                                  classNamePrefix="select"
+                                  value={
+                                    OptionComp1PIC.find(
+                                      (option) =>
+                                        option.value ===
+                                        formik.values.companyRegPemanfaat
+                                          .personnelId
+                                    ) || null // Setting the select value to null if not found
+                                  }
+                                  onChange={(e) => {
+                                    formik.setFieldValue(
+                                      "companyRegPemanfaat.personnelId",
+                                      e ? e.value : null // Set to null when no option is selected
+                                    );
+                                  }}
+                                  isSearchable={true}
+                                  isClearable={true}
+                                  id={"companyRegPemanfaatpersonnelId"}
+                                  name={"companyRegPemanfaatpersonnelId"}
+                                  options={OptionComp1PIC}
+                                />
+                                <FormErrorMessage>
+                                  {
+                                    formik.errors.companyRegPemanfaat
+                                      ?.personnelId
+                                  }
+                                </FormErrorMessage>
+                              </FormControl>
+                            </VStack>
                           </CardBody>
                         </Card>
                       </>
@@ -605,68 +689,76 @@ const ContractsForm = () => {
                       <>
                         <Card>
                           <CardBody>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegPenyalur?.companyId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <VStack w={"full"} align={"start"}>
-                                <FormLabel>
-                                  Persahaan Penyalur [2] : {SelectedComp2}
-                                </FormLabel>
-                                <CardCompany data={SelectedComp2Detail} />
-                                <Button
-                                  onClick={secondModal.onOpen}
-                                  colorScheme={"blue"}
-                                  mr={3}
-                                  size={"sm"}
-                                >
-                                  Pilih Persahaan Penyalur 2
-                                </Button>
-                                <FormErrorMessage>
-                                  {formik.errors.companyRegPenyalur?.companyId}
-                                </FormErrorMessage>
-                              </VStack>
-                            </FormControl>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegPenyalur?.personnelId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <FormLabel>PIC Persahaan Penyalur</FormLabel>
-                              <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                value={
-                                  OptionComp2PIC.find(
-                                    (option) =>
-                                      option.value ===
-                                      formik.values.companyRegPenyalur
-                                        .personnelId
-                                  ) || null // Setting the select value to null if not found
+                            <VStack spacing={3}>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegPenyalur?.companyId
+                                    ? true
+                                    : false
                                 }
-                                onChange={(e) => {
-                                  formik.setFieldValue(
-                                    "companyRegPenyalur.personnelId",
-                                    e ? e.value : null // Set to null when no option is selected
-                                  );
-                                }}
-                                isSearchable={true}
-                                isClearable={true}
-                                id={"companyRegPenyalurpersonnelId"}
-                                name={"companyRegPenyalurpersonnelId"}
-                                options={OptionComp2PIC}
-                              />
-                              <FormErrorMessage>
-                                {formik.errors.companyRegPenyalur?.personnelId}
-                              </FormErrorMessage>
-                            </FormControl>
+                                isRequired
+                              >
+                                <VStack w={"full"} align={"start"}>
+                                  <FormLabel>
+                                    Persahaan Penyalur [2] : {SelectedComp2}
+                                  </FormLabel>
+                                  <CardCompany data={SelectedComp2Detail} />
+                                  <Button
+                                    onClick={secondModal.onOpen}
+                                    colorScheme={"blue"}
+                                    size={"sm"}
+                                    w={"full"}
+                                  >
+                                    Pilih Persahaan Penyalur 2
+                                  </Button>
+                                  <FormErrorMessage>
+                                    {
+                                      formik.errors.companyRegPenyalur
+                                        ?.companyId
+                                    }
+                                  </FormErrorMessage>
+                                </VStack>
+                              </FormControl>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegPenyalur?.personnelId
+                                    ? true
+                                    : false
+                                }
+                                isRequired
+                              >
+                                <FormLabel>PIC Persahaan Penyalur</FormLabel>
+                                <Select
+                                  className="basic-single"
+                                  classNamePrefix="select"
+                                  value={
+                                    OptionComp2PIC.find(
+                                      (option) =>
+                                        option.value ===
+                                        formik.values.companyRegPenyalur
+                                          .personnelId
+                                    ) || null // Setting the select value to null if not found
+                                  }
+                                  onChange={(e) => {
+                                    formik.setFieldValue(
+                                      "companyRegPenyalur.personnelId",
+                                      e ? e.value : null // Set to null when no option is selected
+                                    );
+                                  }}
+                                  isSearchable={true}
+                                  isClearable={true}
+                                  id={"companyRegPenyalurpersonnelId"}
+                                  name={"companyRegPenyalurpersonnelId"}
+                                  options={OptionComp2PIC}
+                                />
+                                <FormErrorMessage>
+                                  {
+                                    formik.errors.companyRegPenyalur
+                                      ?.personnelId
+                                  }
+                                </FormErrorMessage>
+                              </FormControl>
+                            </VStack>
                           </CardBody>
                         </Card>
                       </>
@@ -674,68 +766,76 @@ const ContractsForm = () => {
                       <>
                         <Card>
                           <CardBody>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegTransport?.companyId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <VStack w={"full"} align={"start"}>
-                                <FormLabel>
-                                  Persahaan Transport [3] : {SelectedComp3}
-                                </FormLabel>
-                                <CardCompany data={SelectedComp3Detail} />
-                                <Button
-                                  onClick={thirdModal.onOpen}
-                                  colorScheme={"blue"}
-                                  mr={3}
-                                  size={"sm"}
-                                >
-                                  Pilih Persahaan Transport 3
-                                </Button>
-                                <FormErrorMessage>
-                                  {formik.errors.companyRegTransport?.companyId}
-                                </FormErrorMessage>
-                              </VStack>
-                            </FormControl>
-                            <FormControl
-                              isInvalid={
-                                formik.errors.companyRegTransport?.personnelId
-                                  ? true
-                                  : false
-                              }
-                              isRequired
-                            >
-                              <FormLabel>PIC Persahaan Transport</FormLabel>
-                              <Select
-                                className="basic-single"
-                                classNamePrefix="select"
-                                value={
-                                  OptionComp3PIC.find(
-                                    (option) =>
-                                      option.value ===
-                                      formik.values.companyRegTransport
-                                        .personnelId
-                                  ) || null // Setting the select value to null if not found
+                            <VStack spacing={3}>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegTransport?.companyId
+                                    ? true
+                                    : false
                                 }
-                                onChange={(e) => {
-                                  formik.setFieldValue(
-                                    "companyRegTransport.personnelId",
-                                    e ? e.value : null // Set to null when no option is selected
-                                  );
-                                }}
-                                isSearchable={true}
-                                isClearable={true}
-                                id={"companyRegTransportpersonnelId"}
-                                name={"companyRegTransportpersonnelId"}
-                                options={OptionComp3PIC}
-                              />
-                              <FormErrorMessage>
-                                {formik.errors.companyRegTransport?.personnelId}
-                              </FormErrorMessage>
-                            </FormControl>
+                                isRequired
+                              >
+                                <VStack w={"full"} align={"start"}>
+                                  <FormLabel>
+                                    Persahaan Transport [3] : {SelectedComp3}
+                                  </FormLabel>
+                                  <CardCompany data={SelectedComp3Detail} />
+                                  <Button
+                                    onClick={thirdModal.onOpen}
+                                    colorScheme={"blue"}
+                                    size={"sm"}
+                                    w={"full"}
+                                  >
+                                    Pilih Persahaan Transport 3
+                                  </Button>
+                                  <FormErrorMessage>
+                                    {
+                                      formik.errors.companyRegTransport
+                                        ?.companyId
+                                    }
+                                  </FormErrorMessage>
+                                </VStack>
+                              </FormControl>
+                              <FormControl
+                                isInvalid={
+                                  formik.errors.companyRegTransport?.personnelId
+                                    ? true
+                                    : false
+                                }
+                                isRequired
+                              >
+                                <FormLabel>PIC Persahaan Transport</FormLabel>
+                                <Select
+                                  className="basic-single"
+                                  classNamePrefix="select"
+                                  value={
+                                    OptionComp3PIC.find(
+                                      (option) =>
+                                        option.value ===
+                                        formik.values.companyRegTransport
+                                          .personnelId
+                                    ) || null // Setting the select value to null if not found
+                                  }
+                                  onChange={(e) => {
+                                    formik.setFieldValue(
+                                      "companyRegTransport.personnelId",
+                                      e ? e.value : null // Set to null when no option is selected
+                                    );
+                                  }}
+                                  isSearchable={true}
+                                  isClearable={true}
+                                  id={"companyRegTransportpersonnelId"}
+                                  name={"companyRegTransportpersonnelId"}
+                                  options={OptionComp3PIC}
+                                />
+                                <FormErrorMessage>
+                                  {
+                                    formik.errors.companyRegTransport
+                                      ?.personnelId
+                                  }
+                                </FormErrorMessage>
+                              </FormControl>
+                            </VStack>
                           </CardBody>
                         </Card>
                       </>
@@ -760,9 +860,9 @@ const ContractsForm = () => {
                     <Heading size={"sm"}>COMP 3</Heading>
                     <pre>{JSON.stringify(SelectedComp3Detail, null, 2)}</pre>
                   </Card> */}
-                  <Card w={"full"} p={4} overflowX={"auto"}>
+                  {/* <Card w={"full"} p={4} overflowX={"auto"}>
                     <pre>{JSON.stringify(formik.values, null, 2)}</pre>
-                  </Card>
+                  </Card> */}
                 </VStack>
               </Flex>
             </GridItem>
@@ -808,7 +908,7 @@ const CardCompany = ({ data }: { data: CompanyData | null }) => {
         : logoDefaultCompany
       : logoDefaultCompany;
   return (
-    <Card borderRadius={"xl"}>
+    <Card borderRadius={"xl"} my={1}>
       <CardBody>
         <Grid templateColumns="repeat(7, 1fr)" gap={5} px={5}>
           <GridItem
