@@ -20,6 +20,8 @@ import {
 } from "@tanstack/react-table";
 import { ContractData } from "../../typesModel/ContractTypes";
 import {
+  Avatar,
+  AvatarGroup,
   Badge,
   Box,
   Button,
@@ -43,6 +45,10 @@ import {
   ControlTable,
   TableInputShowPage,
 } from "../../components/TableComponents";
+import {
+  calculateDuration,
+  stringToDateFormated,
+} from "../../helper/MasterHelper";
 
 const initPagesQuery: PagesQueryParameter = {
   search: "",
@@ -100,36 +106,70 @@ const ContractsPage = () => {
       {
         accessorFn: (row) => (
           <>
-            <Grid templateColumns="repeat(7, 1fr)" gap={5}>
-              <GridItem
-                w={"full"}
-                h={"full"}
-                colSpan={6}
-                justifyContent={"center"}
-                alignItems={"center"}
-              >
-                <VStack
-                  alignItems={"start"}
-                  h={"full"}
-                  justifyContent={"center"}
-                >
-                  <Text>{row.contractTitle}</Text>
-                  <Text
-                    fontSize={"xs"}
-                    fontWeight={"700"}
-                    color={"gray.500"}
-                    textTransform={"uppercase"}
-                  >
-                    {row.contractNumber}
-                  </Text>
-                </VStack>
-              </GridItem>
-            </Grid>
+            <Text
+              fontSize={"xs"}
+              fontWeight={"700"}
+              color={"gray.500"}
+              textTransform={"uppercase"}
+            >
+              {row.contractNumber}
+            </Text>
+          </>
+        ),
+        id: "num_contract",
+        cell: (info) => info.getValue(),
+        header: () => <span>Nomor Kontrak</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorFn: (row) => (
+          <>
+            <Text>{row.contractTitle}</Text>
           </>
         ),
         id: "name",
         cell: (info) => info.getValue(),
-        header: () => <span>Kontrak</span>,
+        header: () => <span>Judul</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorFn: (row) => (
+          <>
+            <AvatarGroup size="md" max={3}>
+              {row.contractCompanies.map((data, index) => (
+                <Avatar
+                  key={index}
+                  // bg={"blue.400"}
+                  name={
+                    data.companyData.name != null
+                      ? data.companyData.name
+                      : "P T"
+                  }
+                  src={
+                    data.companyData.companyLogoBase64 != null
+                      ? "data:image/png;base64," +
+                        data.companyData.companyLogoBase64
+                      : ""
+                  }
+                />
+              ))}
+            </AvatarGroup>
+          </>
+        ),
+        id: "instansi",
+        cell: (info) => info.getValue(),
+        header: () => <span>Instansi</span>,
+        footer: (props) => props.column.id,
+      },
+      {
+        accessorFn: (row) => (
+          <>
+            <Text fontSize={"small"}>{calculateDuration(row.startDate, row.endDate)}</Text>
+          </>
+        ),
+        id: "durasi",
+        cell: (info) => info.getValue(),
+        header: () => <span>Durasi</span>,
         footer: (props) => props.column.id,
       },
       {

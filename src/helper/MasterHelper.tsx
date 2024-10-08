@@ -142,6 +142,28 @@ export function stringToDateFormatedReverse(str: string) {
   return `${year}-${month}-${date}`;
 }
 
+export function calculateDuration(start: string, end: string): string {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  const diffInMilliseconds = endDate.getTime() - startDate.getTime();
+
+  const oneDay = 1000 * 60 * 60 * 24;
+  const oneMonth = oneDay * 30; // approximate, for simplicity
+  const oneYear = oneDay * 365; // not accounting for leap years
+
+  const years = Math.floor(diffInMilliseconds / oneYear);
+  const months = Math.floor((diffInMilliseconds % oneYear) / oneMonth);
+  const days = Math.floor((diffInMilliseconds % oneMonth) / oneDay);
+
+  const parts = [];
+  if (years > 0) parts.push(`${years} tahun`);
+  if (months > 0) parts.push(`${months} bulan`);
+  if (days > 0) parts.push(`${days} hari`);
+
+  return parts.length > 0 ? parts.join(", ") : "0 hari";
+}
+
 export const BadgeComponentStatus = ({ status }: { status: string }) => {
   const [statusLabel, setStatusLabel] = React.useState("");
   const [statusColor, setStatusColor] = React.useState("gray");

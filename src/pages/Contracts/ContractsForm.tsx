@@ -27,6 +27,7 @@ import {
   FormLabel,
   Grid,
   GridItem,
+  HStack,
   Heading,
   Input,
   Modal,
@@ -37,10 +38,20 @@ import {
   ModalHeader,
   ModalOverlay,
   Stack,
+  Step,
+  StepIcon,
+  StepIndicator,
+  StepNumber,
+  StepSeparator,
+  StepStatus,
+  StepTitle,
+  Stepper,
   Text,
   Textarea,
   VStack,
+  useBreakpointValue,
   useDisclosure,
+  useSteps,
 } from "@chakra-ui/react";
 import {
   ArrowBackIcon,
@@ -111,6 +122,13 @@ const FormSchema = Yup.object().shape({
   endDate: Yup.string().required("Wajib di isi!"),
 });
 
+const steps = [
+  { title: "Detail Kontrak" },
+  { title: "Pemanfaat" },
+  { title: "Penyalur" },
+  { title: "Transport" },
+];
+
 const ContractsForm = () => {
   const [SearchParams] = useSearchParams();
   const showToast = useToastHelper();
@@ -124,6 +142,31 @@ const ContractsForm = () => {
   );
   const [EditMode, setEditMode] = useState(false);
   const [Data, setData] = useState<ContractData | null>(null);
+
+  // Wizrd setup --------------------------------
+
+  const { activeStep, goToNext, goToPrevious } = useSteps({
+    index: 0,
+  });
+
+  const handleNext = () => {
+    if (activeStep < steps.length - 1) {
+      goToNext();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (activeStep > 0) {
+      goToPrevious();
+    }
+  };
+
+  const orientation = useBreakpointValue({
+    base: "vertical",
+    md: "horizontal",
+  }) as "horizontal" | "vertical";
+
+  // end wizrd setup ------------------------
 
   // recognition id
   useEffect(() => {
@@ -456,6 +499,7 @@ const ContractsForm = () => {
         description: SaveData.message,
         statusToast: "success",
       });
+      BackPageAction();
     } else {
       showToast({
         description: SaveData.message,
@@ -513,104 +557,141 @@ const ContractsForm = () => {
             </GridItem>
             <GridItem w={"full"} colSpan={{ base: 12, md: 12 }}>
               <Card borderRadius={borderRadiusSchemes}>
+                <CardBody>
+                  <Stepper
+                    index={activeStep}
+                    colorScheme="blue"
+                    orientation={orientation}
+                  >
+                    {steps.map((step, index) => (
+                      <Step key={index}>
+                        <StepIndicator>
+                          <StepStatus
+                            complete={<StepIcon />}
+                            incomplete={<StepNumber />}
+                            active={<StepNumber />}
+                          />
+                        </StepIndicator>
+                        <Box flexShrink="0">
+                          <StepTitle>{step.title}</StepTitle>
+                        </Box>
+                        <StepSeparator />
+                      </Step>
+                    ))}
+                  </Stepper>
+                </CardBody>
+              </Card>
+            </GridItem>
+            <GridItem w={"full"} colSpan={{ base: 12, md: 12 }}>
+              <Card borderRadius={borderRadiusSchemes}>
                 <CardHeader>
                   <Heading size={"md"}>Pengisian Kontrak Baru</Heading>
                 </CardHeader>
                 <CardBody>
-                  <Flex w={"full"} justifyContent={"center"} pb={10}>
-                    <VStack w={{ base: "full", md: "80%" }}>
-                      <FormControl
-                        isInvalid={formik.errors.contractNumber ? true : false}
-                        isRequired
-                      >
-                        <FormLabel>Nomor Kontrak</FormLabel>
-                        <Input
-                          id={"contractNumber"}
-                          name={"contractNumber"}
-                          type={"text"}
-                          onChange={formik.handleChange}
-                          value={formik.values.contractNumber}
-                          placeholder="Nomor Kontrak"
-                          disabled={EditMode}
-                        />
-                        <FormErrorMessage>
-                          {formik.errors.contractNumber}
-                        </FormErrorMessage>
-                      </FormControl>
-                      <FormControl
-                        isInvalid={formik.errors.contractTitle ? true : false}
-                        isRequired
-                      >
-                        <FormLabel>Judul Kontrak</FormLabel>
-                        <Input
-                          id={"contractTitle"}
-                          name={"contractTitle"}
-                          type={"text"}
-                          onChange={formik.handleChange}
-                          value={formik.values.contractTitle}
-                          placeholder="Judul Kontrak"
-                        />
-                        <FormErrorMessage>
-                          {formik.errors.contractTitle}
-                        </FormErrorMessage>
-                      </FormControl>
-                      <FormControl
-                        isInvalid={formik.errors.contractDetails ? true : false}
-                      >
-                        <FormLabel>Deskripsi</FormLabel>
-                        <Textarea
-                          id={"contractDetails"}
-                          name={"contractDetails"}
-                          onChange={formik.handleChange}
-                          value={formik.values.contractDetails}
-                          placeholder="Deskripsi"
-                        />
-                        <FormErrorMessage>
-                          {formik.errors.contractDetails}
-                        </FormErrorMessage>
-                      </FormControl>
-
-                      <FormControl
-                        isInvalid={formik.errors.startDate ? true : false}
-                        isRequired
-                      >
-                        <FormLabel>Tanggal Mulai Kontrak</FormLabel>
-                        <SingleDatepicker
-                          id="startDate"
-                          name="startDate"
-                          date={StartContractDate}
-                          onDateChange={(e) => {
-                            setStartContractDate(e);
-                            HandlingStartContractDate(e);
-                          }}
-                        />
-                        <FormErrorMessage>
-                          {formik.errors.startDate}
-                        </FormErrorMessage>
-                      </FormControl>
-
-                      <FormControl
-                        isInvalid={formik.errors.endDate ? true : false}
-                        isRequired
-                      >
-                        <FormLabel>Tanggal Akhir Kontrak</FormLabel>
-                        <SingleDatepicker
-                          id="endDate"
-                          name="endDate"
-                          date={EndContractDate}
-                          onDateChange={(e) => {
-                            setEndContractDate(e);
-                            HandlingEndContractDate(e);
-                          }}
-                        />
-                        <FormErrorMessage>
-                          {formik.errors.endDate}
-                        </FormErrorMessage>
-                      </FormControl>
-
-                      <Divider py={2} />
-                      <>
-                        <Card>
+                  {activeStep === 0 && (
+                    <>
+                      <Flex w={"full"} justifyContent={"center"} pb={10}>
+                        <VStack w={{ base: "full", md: "80%" }}>
+                          <FormControl
+                            isInvalid={
+                              formik.errors.contractNumber ? true : false
+                            }
+                            isRequired
+                          >
+                            <FormLabel>Nomor Kontrak</FormLabel>
+                            <Input
+                              id={"contractNumber"}
+                              name={"contractNumber"}
+                              type={"text"}
+                              onChange={formik.handleChange}
+                              value={formik.values.contractNumber}
+                              placeholder="Nomor Kontrak"
+                              disabled={EditMode}
+                            />
+                            <FormErrorMessage>
+                              {formik.errors.contractNumber}
+                            </FormErrorMessage>
+                          </FormControl>
+                          <FormControl
+                            isInvalid={
+                              formik.errors.contractTitle ? true : false
+                            }
+                            isRequired
+                          >
+                            <FormLabel>Judul Kontrak</FormLabel>
+                            <Input
+                              id={"contractTitle"}
+                              name={"contractTitle"}
+                              type={"text"}
+                              onChange={formik.handleChange}
+                              value={formik.values.contractTitle}
+                              placeholder="Judul Kontrak"
+                            />
+                            <FormErrorMessage>
+                              {formik.errors.contractTitle}
+                            </FormErrorMessage>
+                          </FormControl>
+                          <FormControl
+                            isInvalid={
+                              formik.errors.contractDetails ? true : false
+                            }
+                          >
+                            <FormLabel>Deskripsi</FormLabel>
+                            <Textarea
+                              id={"contractDetails"}
+                              name={"contractDetails"}
+                              onChange={formik.handleChange}
+                              value={formik.values.contractDetails}
+                              placeholder="Deskripsi"
+                            />
+                            <FormErrorMessage>
+                              {formik.errors.contractDetails}
+                            </FormErrorMessage>
+                          </FormControl>
+                          <FormControl
+                            isInvalid={formik.errors.startDate ? true : false}
+                            isRequired
+                          >
+                            <FormLabel>Tanggal Mulai Kontrak</FormLabel>
+                            <SingleDatepicker
+                              id="startDate"
+                              name="startDate"
+                              date={StartContractDate}
+                              onDateChange={(e) => {
+                                setStartContractDate(e);
+                                HandlingStartContractDate(e);
+                              }}
+                            />
+                            <FormErrorMessage>
+                              {formik.errors.startDate}
+                            </FormErrorMessage>
+                          </FormControl>
+                          <FormControl
+                            isInvalid={formik.errors.endDate ? true : false}
+                            isRequired
+                          >
+                            <FormLabel>Tanggal Akhir Kontrak</FormLabel>
+                            <SingleDatepicker
+                              id="endDate"
+                              name="endDate"
+                              date={EndContractDate}
+                              onDateChange={(e) => {
+                                setEndContractDate(e);
+                                HandlingEndContractDate(e);
+                              }}
+                            />
+                            <FormErrorMessage>
+                              {formik.errors.endDate}
+                            </FormErrorMessage>
+                          </FormControl>
+                        </VStack>
+                      </Flex>
+                    </>
+                  )}
+                  {activeStep === 1 && (
+                    <>
+                      <Flex w={"full"} justifyContent={"center"} pb={10}>
+                        <Card w={{ base: "full", md: "80%" }}>
                           <CardBody>
                             <VStack spacing={3}>
                               <FormControl
@@ -622,9 +703,7 @@ const ContractsForm = () => {
                                 isRequired
                               >
                                 <VStack w={"full"} align={"start"}>
-                                  <FormLabel>
-                                    Persahaan Pemanfaat [1] : {SelectedComp1}
-                                  </FormLabel>
+                                  <FormLabel>Persahaan Pemanfaat [1]</FormLabel>
                                   <CardCompany data={SelectedComp1Detail} />
                                   <Button
                                     onClick={firstModal.onOpen}
@@ -684,10 +763,13 @@ const ContractsForm = () => {
                             </VStack>
                           </CardBody>
                         </Card>
-                      </>
-
-                      <>
-                        <Card>
+                      </Flex>
+                    </>
+                  )}
+                  {activeStep === 2 && (
+                    <>
+                      <Flex w={"full"} justifyContent={"center"} pb={10}>
+                        <Card w={{ base: "full", md: "80%" }}>
                           <CardBody>
                             <VStack spacing={3}>
                               <FormControl
@@ -699,9 +781,7 @@ const ContractsForm = () => {
                                 isRequired
                               >
                                 <VStack w={"full"} align={"start"}>
-                                  <FormLabel>
-                                    Persahaan Penyalur [2] : {SelectedComp2}
-                                  </FormLabel>
+                                  <FormLabel>Persahaan Penyalur [2]</FormLabel>
                                   <CardCompany data={SelectedComp2Detail} />
                                   <Button
                                     onClick={secondModal.onOpen}
@@ -761,10 +841,13 @@ const ContractsForm = () => {
                             </VStack>
                           </CardBody>
                         </Card>
-                      </>
-
-                      <>
-                        <Card>
+                      </Flex>
+                    </>
+                  )}
+                  {activeStep === 3 && (
+                    <>
+                      <Flex w={"full"} justifyContent={"center"} pb={10}>
+                        <Card w={{ base: "full", md: "80%" }}>
                           <CardBody>
                             <VStack spacing={3}>
                               <FormControl
@@ -776,9 +859,7 @@ const ContractsForm = () => {
                                 isRequired
                               >
                                 <VStack w={"full"} align={"start"}>
-                                  <FormLabel>
-                                    Persahaan Transport [3] : {SelectedComp3}
-                                  </FormLabel>
+                                  <FormLabel>Persahaan Transport [3]</FormLabel>
                                   <CardCompany data={SelectedComp3Detail} />
                                   <Button
                                     onClick={thirdModal.onOpen}
@@ -838,8 +919,26 @@ const ContractsForm = () => {
                             </VStack>
                           </CardBody>
                         </Card>
-                      </>
-                    </VStack>
+                      </Flex>
+                    </>
+                  )}
+                  <Flex mt={4} justify="end">
+                    <HStack>
+                      <Button
+                        onClick={handlePrevious}
+                        isDisabled={activeStep === 0}
+                        colorScheme="blue"
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        onClick={handleNext}
+                        isDisabled={activeStep === steps.length - 1}
+                        colorScheme="blue"
+                      >
+                        Next
+                      </Button>
+                    </HStack>
                   </Flex>
                 </CardBody>
               </Card>
@@ -908,7 +1007,7 @@ const CardCompany = ({ data }: { data: CompanyData | null }) => {
         : logoDefaultCompany
       : logoDefaultCompany;
   return (
-    <Card borderRadius={"xl"} my={1}>
+    <Card borderRadius={"xl"} my={1} w={"full"}>
       <CardBody>
         <Grid templateColumns="repeat(7, 1fr)" gap={5} px={5}>
           <GridItem
